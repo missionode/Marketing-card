@@ -4,17 +4,17 @@
   "description": "A magical marketing reveal experience.",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#F8F9FA",
+  "theme_color": "#1E1B4B",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "Marketing card.png",
+      "src": "android-chrome-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "Marketing card.png",
+      "src": "android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

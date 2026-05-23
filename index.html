@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Magic Card Reveal</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <meta name="theme-color" content="#000000">
@@ -12,449 +14,133 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
         :root {
-            --pearl-white: #F8F9FA;
-            --mist-grey: #E9ECEF;
-            --soft-silver: #DEE2E6;
-            --violet: #8B5CF6;
-            --lavender: #C4B5FD;
-            --magenta: #D946EF;
-            --cyan: #22D3EE;
+            --pearl-white: #F8F9FA; --mist-grey: #E9ECEF; --soft-silver: #DEE2E6;
+            --violet: #8B5CF6; --lavender: #C4B5FD; --magenta: #D946EF; --cyan: #22D3EE;
             --deep-indigo: #1E1B4B;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body, html { 
-            width: 100%; height: 100%; overflow: hidden; 
-            background-color: var(--pearl-white); 
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            color: var(--deep-indigo); 
-        }
-
-        #stage { 
-            width: 100%; height: 100%; position: relative; 
-            display: flex; justify-content: center; align-items: center; 
-            overflow: hidden;
-            background: radial-gradient(circle at center, var(--pearl-white) 0%, var(--mist-grey) 100%);
-        }
-
-        /* --- GLOBAL AMBIENT FLUID BACKGROUND --- */
-        #pledge { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            filter: url('#liquid-mercury'); z-index: 1; 
-            transition: opacity 1.2s ease;
-        }
-
-        .background-blob {
-            position: absolute; width: 600px; height: 600px; border-radius: 50%;
-            opacity: 0.4; mix-blend-mode: multiply;
-        }
-
-        /* --- SHARED GLASSMORPHIC UI --- */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(40px) saturate(1.8);
-            -webkit-backdrop-filter: blur(40px) saturate(1.8);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            border-radius: 40px;
-            padding: 48px 32px;
-            box-shadow: 
-                0 30px 60px rgba(30, 27, 75, 0.12),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.3);
-            width: 92%;
-            max-width: 380px;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 40%, rgba(255,255,255,0.2) 60%, transparent 100%);
-            transform: rotate(-15deg);
-            pointer-events: none;
-        }
-
-        .primary-btn {
-            background: var(--deep-indigo);
-            color: white;
-            border: none;
-            padding: 20px 48px;
-            border-radius: 100px;
-            font-size: 16px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            cursor: pointer;
-            box-shadow: 0 12px 30px rgba(30, 27, 75, 0.2);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            margin-top: 32px;
-        }
-
-        .primary-btn:active { transform: scale(0.96); box-shadow: 0 6px 15px rgba(30, 27, 75, 0.2); }
-
-        /* --- NOTAKTO GAME BOARD --- */
-        #game-overlay { 
-            position: absolute; width: 100%; height: 100%; 
-            display: none; flex-direction: column; justify-content: center; align-items: center; 
-            padding: 20px; z-index: 10;
-        }
-
-        #ttt-board { 
-            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 12px; 
-            width: 100%; max-width: 300px; aspect-ratio: 1; margin-bottom: 32px;
-        }
-
-        .cell { 
-            background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); 
-            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; 
-            display: flex; justify-content: center; align-items: center; 
-            font-size: 40px; font-weight: 900; color: var(--deep-indigo); 
-            cursor: pointer; transition: all 0.25s ease;
-        }
-
-        .cell.marked { 
-            background: white; color: var(--magenta); 
-            box-shadow: 0 10px 25px rgba(217, 70, 239, 0.2); transform: scale(1.05); 
-        }
-
-        /* --- TOSS UI --- */
-        #toss-screen { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            z-index: 250; background: transparent; display: none; 
-            flex-direction: column; justify-content: center; align-items: center; 
-            transition: opacity 0.6s ease;
-        }
-
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: var(--pearl-white); font-family: 'Poppins', sans-serif; color: var(--deep-indigo); }
+        #stage { width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden; background: radial-gradient(circle at center, var(--pearl-white) 0%, var(--mist-grey) 100%); }
+        #pledge { position: absolute; top: 0; left: 0; width: 100%; height: 100%; filter: url('#liquid-mercury'); z-index: 1; transition: opacity 1.2s ease; }
+        .background-blob { position: absolute; width: 600px; height: 600px; border-radius: 50%; opacity: 0.4; mix-blend-mode: multiply; }
+        .glass-card { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(40px) saturate(1.8); -webkit-backdrop-filter: blur(40px) saturate(1.8); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 40px; padding: 48px 32px; box-shadow: 0 30px 60px rgba(30, 27, 75, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.3); width: 92%; max-width: 380px; z-index: 10; display: flex; flex-direction: column; align-items: center; text-align: center; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); position: relative; overflow: hidden; }
+        .glass-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 40%, rgba(255,255,255,0.2) 60%, transparent 100%); transform: rotate(-15deg); pointer-events: none; }
+        .primary-btn { background: var(--deep-indigo); color: white; border: none; padding: 20px 48px; border-radius: 100px; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 12px 30px rgba(30, 27, 75, 0.2); transition: all 0.3s ease; margin-top: 32px; }
+        .primary-btn:active { transform: scale(0.96); }
+        #game-overlay { position: absolute; width: 100%; height: 100%; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; z-index: 10; }
+        #ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 300px; aspect-ratio: 1; margin-bottom: 32px; }
+        .cell { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 40px; font-weight: 900; color: var(--deep-indigo); cursor: pointer; transition: all 0.25s ease; }
+        .cell.marked { background: white; color: var(--magenta); box-shadow: 0 10px 25px rgba(217, 70, 239, 0.2); transform: scale(1.05); }
+        #toss-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 250; background: transparent; display: none; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.6s ease; }
         .coin-container { width: 140px; height: 140px; perspective: 1200px; margin-bottom: 60px; position: relative; }
         .coin { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg); }
-        .coin-side {
-            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
-            border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            font-size: 28px; font-weight: 900; border: 6px solid #fff;
-            background: white; box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
-        }
+        .coin-side { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; font-weight: 900; border: 6px solid #fff; background: white; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
         .coin-ai { background: linear-gradient(135deg, var(--violet), var(--cyan)); color: white; transform: translateZ(2px); }
         .coin-human { transform: rotateY(180deg) translateZ(2px); color: var(--magenta); }
         .coin-shadow { position: absolute; bottom: -30px; left: 50%; width: 100px; height: 15px; background: rgba(0,0,0,0.1); border-radius: 50%; filter: blur(8px); transform: translateX(-50%) scale(1); transition: all 0.8s ease; pointer-events: none; }
-        
         .toss-up { animation: coin-toss-arc 2.5s cubic-bezier(0.1, 0, 0.3, 1) forwards; }
         @keyframes coin-toss-arc { 0% { transform: translateY(0); } 30% { transform: translateY(-300px); } 100% { transform: translateY(0); } }
         .coin-flip { animation: coin-spin 2.5s cubic-bezier(0.1, 0, 0.3, 1) forwards; }
         @keyframes coin-spin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(var(--final-rotation-y)); } }
-
-        /* --- WINNER ANNOUNCEMENT --- */
-        #winner-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 500;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(50px) saturate(2);
-            transition: opacity 0.5s ease;
-        }
-
-        #winner-screen h2 {
-            font-size: 14px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            color: var(--deep-indigo);
-            opacity: 0.6;
-            margin-bottom: 10px;
-        }
-
-        #winner-name {
-            font-size: 42px;
-            font-weight: 900;
-            letter-spacing: -2px;
-            line-height: 1;
-            color: var(--magenta);
-            text-shadow: 0 10px 30px rgba(217, 70, 239, 0.3);
-        }
-
-        /* --- PRESTIGE --- */
-        #prestige { 
-            position: absolute; width: 100%; height: 100%; z-index: 100; 
-            display: flex; justify-content: center; align-items: center; 
-            opacity: 0; transform: scale(0.9) translateY(40px); visibility: hidden;
-            transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease; 
-        }
+        #winner-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 500; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(50px) saturate(2); opacity: 0; transition: opacity 0.5s ease; }
+        #winner-screen h2 { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 4px; color: var(--deep-indigo); opacity: 0.6; margin-bottom: 10px; }
+        #winner-name { font-size: 42px; font-weight: 900; letter-spacing: -2px; line-height: 1; color: var(--magenta); text-shadow: 0 10px 30px rgba(217, 70, 239, 0.3); }
+        #prestige { position: absolute; width: 100%; height: 100%; z-index: 100; display: flex; justify-content: center; align-items: center; opacity: 0; transform: scale(0.9) translateY(40px); visibility: hidden; transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease; }
         #prestige img { max-width: 95%; max-height: 90%; object-fit: contain; border-radius: 24px; box-shadow: 0 40px 100px rgba(30, 27, 75, 0.3); }
         #prestige.active { opacity: 1; transform: scale(1) translateY(0); visibility: visible; }
-
         #flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; opacity: 0; pointer-events: none; }
         .flash-anim { animation: flash-pulse 0.5s ease-out forwards; }
         @keyframes flash-pulse { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }
-
-        #start-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 200;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.8s ease;
-        }
-
-        .badge {
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--violet);
-            padding: 6px 16px;
-            border-radius: 100px;
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 24px;
-        }
-
+        #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.8s ease; }
+        .badge { background: rgba(139, 92, 246, 0.1); color: var(--violet); padding: 6px 16px; border-radius: 100px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 24px; }
         h1 { font-size: 32px; font-weight: 900; letter-spacing: -1px; line-height: 1.1; margin-bottom: 16px; }
         .intro-text { font-size: 15px; line-height: 1.6; opacity: 0.7; font-weight: 500; margin-bottom: 8px; }
-        
         .game-status { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; opacity: 0.5; margin-top: 16px; transition: all 0.3s ease; }
     </style>
 </head>
 <body>
-    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display:none">
-        <defs>
-            <filter id="liquid-mercury">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="40" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -15" result="goo" />
-                <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
-            </filter>
-        </defs>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <defs><filter id="liquid-mercury"><feGaussianBlur in="SourceGraphic" stdDeviation="40" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -15" result="goo" /><feComposite in="SourceGraphic" in2="goo" operator="atop"/></filter></defs>
     </svg>
-
     <div id="stage">
         <div id="pledge">
-            <div id="blob-1" class="background-blob"></div>
-            <div id="blob-2" class="background-blob"></div>
-            <div id="blob-3" class="background-blob"></div>
-            <div id="blob-4" class="background-blob"></div>
+            <div id="blob-1" class="background-blob"></div><div id="blob-2" class="background-blob"></div>
+            <div id="blob-3" class="background-blob"></div><div id="blob-4" class="background-blob"></div>
         </div>
-
-        <div id="start-screen">
-            <div class="glass-card">
-                <div class="badge">AI Intelligence Demo</div>
-                <h1>Notakto Avoidance</h1>
-                <p class="intro-text">Challenge the machine in a game of pure foresight.</p>
-                <p class="intro-text" style="font-size: 13px; font-weight: 700;">RULES: Both players use X. The first to make 3-in-a-row loses.</p>
-                <button id="start-btn" class="primary-btn">Begin Match</button>
-            </div>
-        </div>
-
-        <div id="toss-screen">
-            <div class="glass-card">
-                <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 40px; letter-spacing: 1px;">DECIDING INITIATIVE</h2>
-                <div class="coin-container">
-                    <div id="coin" class="coin">
-                        <div class="coin-side coin-ai">AI</div>
-                        <div class="coin-side coin-human">YOU</div>
-                    </div>
-                    <div id="coin-shadow" class="coin-shadow"></div>
-                </div>
-                <p id="toss-result" style="font-size: 13px; font-weight: 800; opacity: 0.5; text-transform: uppercase; letter-spacing: 2px;">Flipping...</p>
-            </div>
-        </div>
-
-        <div id="game-overlay">
-            <div id="ttt-board">
-                <div class="cell" data-index="0"></div><div class="cell" data-index="1"></div><div class="cell" data-index="2"></div>
-                <div class="cell" data-index="3"></div><div class="cell" data-index="4"></div><div class="cell" data-index="5"></div>
-                <div class="cell" data-index="6"></div><div class="cell" data-index="7"></div><div class="cell" data-index="8"></div>
-            </div>
-            <div id="game-status" class="game-status">Synchronizing...</div>
-        </div>
-
-        <div id="winner-screen">
-            <h2>The Match Result</h2>
-            <div id="winner-name">AI PRECISION WINS</div>
-        </div>
-        
-        <div id="prestige">
-            <img src="Marketing card.png" alt="Card">
-        </div>
-
-        <div id="flash"></div>
+        <div id="start-screen"><div class="glass-card"><div class="badge">AI Intelligence Demo</div><h1>Notakto Avoidance</h1><p class="intro-text">Challenge the machine in a game of pure foresight.</p><p class="intro-text" style="font-size: 13px; font-weight: 700;">RULES: Both players use X. The first to make 3-in-a-row loses.</p><button id="start-btn" class="primary-btn">Begin Match</button></div></div>
+        <div id="toss-screen"><div class="glass-card"><h2 style="font-size: 20px; font-weight: 900; margin-bottom: 40px; letter-spacing: 1px;">DECIDING INITIATIVE</h2><div class="coin-container"><div id="coin" class="coin"><div class="coin-side coin-ai">AI</div><div class="coin-side coin-human">YOU</div></div><div id="coin-shadow" class="coin-shadow"></div></div><p id="toss-result" style="font-size: 13px; font-weight: 800; opacity: 0.5; text-transform: uppercase; letter-spacing: 2px;">Flipping...</p></div></div>
+        <div id="game-overlay"><div id="ttt-board"><div class="cell" data-index="0"></div><div class="cell" data-index="1"></div><div class="cell" data-index="2"></div><div class="cell" data-index="3"></div><div class="cell" data-index="4"></div><div class="cell" data-index="5"></div><div class="cell" data-index="6"></div><div class="cell" data-index="7"></div><div class="cell" data-index="8"></div></div><div id="game-status" class="game-status">Synchronizing...</div></div>
+        <div id="winner-screen"><h2>The Match Result</h2><div id="winner-name">AI PRECISION WINS</div></div>
+        <div id="prestige"><img src="Marketing card.png" alt="Card"></div><div id="flash"></div>
     </div>
-
     <script>
-        const pledge = document.getElementById('pledge');
-        const prestige = document.getElementById('prestige');
-        const flash = document.getElementById('flash');
-        const startBtn = document.getElementById('start-btn');
-        const startScreen = document.getElementById('start-screen');
-        const tossScreen = document.getElementById('toss-screen');
-        const coin = document.getElementById('coin');
-        const coinShadow = document.getElementById('coin-shadow');
-        const tossResult = document.getElementById('toss-result');
-        const gameOverlay = document.getElementById('game-overlay');
-        const gameStatus = document.getElementById('game-status');
-        const winnerScreen = document.getElementById('winner-screen');
-        const winnerName = document.getElementById('winner-name');
-        const cells = document.querySelectorAll('.cell');
-        const backgroundBlobs = document.querySelectorAll('.background-blob');
-
-        let audioCtx;
-        let isRevealed = false;
-        let gameActive = true;
-        let board = ["", "", "", "", "", "", "", "", ""];
-        let currentPlayer = ""; 
-
+        const pledge = document.getElementById('pledge'); const prestige = document.getElementById('prestige'); const flash = document.getElementById('flash'); const startBtn = document.getElementById('start-btn'); const startScreen = document.getElementById('start-screen'); const tossScreen = document.getElementById('toss-screen'); const winnerScreen = document.getElementById('winner-screen'); const winnerName = document.getElementById('winner-name'); const coin = document.getElementById('coin'); const coinShadow = document.getElementById('coin-shadow'); const tossResult = document.getElementById('toss-result'); const gameOverlay = document.getElementById('game-overlay'); const gameStatus = document.getElementById('game-status'); const cells = document.querySelectorAll('.cell'); const backgroundBlobs = document.querySelectorAll('.background-blob');
+        let audioCtx; let isRevealed = false; let gameActive = true; let board = ["", "", "", "", "", "", "", "", ""]; let currentPlayer = ""; 
         const winConditions = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-
         const points = Array.from(backgroundBlobs).map((blob, i) => {
-            const colors = ["#8B5CF6", "#C4B5FD", "#D946EF", "#22D3EE"];
-            blob.style.background = `radial-gradient(circle, ${colors[i]}, transparent 70%)`;
+            const colors = ["#8B5CF6", "#C4B5FD", "#D946EF", "#22D3EE"]; blob.style.background = `radial-gradient(circle, ${colors[i]}, transparent 70%)`;
             return { x: Math.random() * 100, y: Math.random() * 100, vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5, sin: Math.random() * Math.PI, speed: 0.02 + Math.random() * 0.03 };
         });
-
         function animateBackground() {
-            points.forEach((p, i) => {
-                p.sin += p.speed;
-                p.x += p.vx + Math.sin(p.sin) * 0.25; p.y += p.vy + Math.cos(p.sin) * 0.25;
-                if (p.x < 5 || p.x > 95) p.vx *= -1; if (p.y < 5 || p.y > 95) p.vy *= -1;
-                backgroundBlobs[i].style.left = p.x + '%'; backgroundBlobs[i].style.top = p.y + '%';
-            });
+            points.forEach((p, i) => { p.sin += p.speed; p.x += p.vx + Math.sin(p.sin) * 0.25; p.y += p.vy + Math.cos(p.sin) * 0.25; if (p.x < 5 || p.x > 95) p.vx *= -1; if (p.y < 5 || p.y > 95) p.vy *= -1; backgroundBlobs[i].style.left = p.x + '%'; backgroundBlobs[i].style.top = p.y + '%'; });
             requestAnimationFrame(animateBackground);
         }
         animateBackground();
-
         async function initAudio() { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-
         function playSound(freq, duration = 0.1) {
-            if (!audioCtx) return;
-            const osc = audioCtx.createOscillator(); const g = audioCtx.createGain();
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            g.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-            osc.connect(g); g.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
+            if (!audioCtx) return; const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.frequency.setValueAtTime(freq, audioCtx.currentTime); g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration); osc.connect(g); g.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
-
         function triggerReveal(winner) {
-            if (isRevealed) return; isRevealed = true;
-            gameActive = false;
-
-            // 1. Show Winner Screen
+            if (isRevealed) return; isRevealed = true; gameActive = false;
             winnerName.innerText = winner === "AI" ? "AI PRECISION WINS" : "HUMAN INSIGHT WINS";
-            winnerScreen.style.display = "flex";
-            setTimeout(() => winnerScreen.style.opacity = "1", 10);
-
-            // 2. Play Triumphant Harmony
-            const now = audioCtx.currentTime;
-            const pt = (f, s, d) => {
-                const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-                o.type = 'triangle'; o.frequency.setValueAtTime(f, now + s);
-                g.gain.setValueAtTime(0, now + s); g.gain.linearRampToValueAtTime(0.4, now + s + 0.05); g.gain.exponentialRampToValueAtTime(0.01, now + s + d);
-                o.connect(g); g.connect(audioCtx.destination); o.start(now + s); o.stop(now + s + d);
-            };
+            winnerScreen.style.display = "flex"; setTimeout(() => winnerScreen.style.opacity = "1", 10);
+            const now = audioCtx.currentTime; const pt = (f, s, d) => { const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(f, now + s); g.gain.setValueAtTime(0, now + s); g.gain.linearRampToValueAtTime(0.4, now + s + 0.05); g.gain.exponentialRampToValueAtTime(0.01, now + s + d); o.connect(g); g.connect(audioCtx.destination); o.start(now + s); o.stop(now + s + d); };
             pt(261.63, 0, 1.0); pt(329.63, 0.1, 1.0); pt(392.00, 0.2, 1.0); pt(523.25, 0.3, 1.5);
-
-            // 3. Bright Flash & Final Reveal
-            setTimeout(() => {
-                flash.classList.add('flash-anim');
-                setTimeout(() => {
-                    winnerScreen.style.display = "none";
-                    gameOverlay.style.opacity = '0';
-                    prestige.classList.add('active'); 
-                    pledge.style.opacity = '0.7';
-                }, 100);
-            }, 1800);
+            setTimeout(() => { flash.classList.add('flash-anim'); setTimeout(() => { winnerScreen.style.display = "none"; gameOverlay.style.opacity = '0'; prestige.classList.add('active'); pledge.style.opacity = '0.7'; }, 100); }, 1800);
         }
-
         async function runToss() {
             startScreen.style.opacity = '0';
             setTimeout(() => {
-                startScreen.style.display = 'none';
-                tossScreen.style.display = 'flex';
+                startScreen.style.display = 'none'; tossScreen.style.display = 'flex';
                 setTimeout(() => {
-                    const aiWinsToss = Math.random() > 0.4;
-                    const finalY = (5 + Math.floor(Math.random() * 5)) * 180 + (aiWinsToss ? 0 : 180);
-                    document.documentElement.style.setProperty('--final-rotation-y', `${finalY}deg`);
-                    coin.parentElement.classList.add('toss-up'); coin.classList.add('coin-flip');
-                    coinShadow.style.transform = 'translateX(-50%) scale(0.4)'; coinShadow.style.opacity = '0.05';
-                    playSound(440, 0.2);
+                    const aiWinsToss = Math.random() > 0.4; const finalY = (5 + Math.floor(Math.random() * 5)) * 180 + (aiWinsToss ? 0 : 180);
+                    document.documentElement.style.setProperty('--final-rotation-y', `${finalY}deg`); coin.parentElement.classList.add('toss-up'); coin.classList.add('coin-flip'); coinShadow.style.transform = 'translateX(-50%) scale(0.4)'; coinShadow.style.opacity = '0.05'; playSound(440, 0.2);
                     setTimeout(() => {
-                        tossResult.innerText = aiWinsToss ? "AI INITIATIVE" : "YOUR INITIATIVE";
-                        playSound(aiWinsToss ? 880 : 660, 0.4);
-                        coinShadow.style.transform = 'translateX(-50%) scale(1)'; coinShadow.style.opacity = '0.1';
-                        setTimeout(() => {
-                            tossScreen.style.opacity = '0';
-                            setTimeout(() => {
-                                tossScreen.style.display = 'none';
-                                gameOverlay.style.display = 'flex';
-                                gameOverlay.style.opacity = '1';
-                                currentPlayer = aiWinsToss ? "O" : "X";
-                                if (aiWinsToss) {
-                                    gameStatus.innerText = "AI Processing Initiative...";
-                                    setTimeout(aiMove, 1200); // Clearer initiative for AI
-                                } else {
-                                    gameStatus.innerText = "Your Turn (Avoid 3-in-a-row)";
-                                }
-                            }, 500);
-                        }, 1500);
+                        tossResult.innerText = aiWinsToss ? "AI INITIATIVE" : "YOUR INITIATIVE"; playSound(aiWinsToss ? 880 : 660, 0.4); coinShadow.style.transform = 'translateX(-50%) scale(1)'; coinShadow.style.opacity = '0.1';
+                        setTimeout(() => { tossScreen.style.opacity = '0'; setTimeout(() => { tossScreen.style.display = 'none'; gameOverlay.style.display = 'flex'; gameOverlay.style.opacity = '1'; currentPlayer = aiWinsToss ? "O" : "X"; if (aiWinsToss) { gameStatus.innerText = "AI Processing Initiative..."; setTimeout(aiMove, 1200); } else { gameStatus.innerText = "Your Turn (Avoid 3-in-a-row)"; } }, 500); }, 1500);
                     }, 2500);
                 }, 500);
             }, 600);
         }
-
         function handleCellClick(e) {
-            const index = e.target.getAttribute('data-index');
-            // Only allow interaction if it's the Human's turn (X)
-            if (board[index] !== "" || !gameActive || currentPlayer !== "X" || isRevealed) return;
-            
+            const index = e.target.getAttribute('data-index'); if (board[index] !== "" || !gameActive || currentPlayer !== "X" || isRevealed) return;
             makeMove(index);
-            if (checkLose(board)) {
-                triggerReveal("AI");
-            } else {
-                currentPlayer = "O";
-                gameStatus.innerText = "AI Calculating Trap...";
-                setTimeout(aiMove, 1000);
+            setTimeout(() => { if (checkLose(board)) triggerReveal("AI"); else { currentPlayer = "O"; gameStatus.innerText = "AI Calculating Trap..."; setTimeout(aiMove, 1000); } }, 300);
+        }
+        function makeMove(index) { board[index] = "X"; cells[index].innerText = "X"; cells[index].classList.add('marked'); playSound(currentPlayer === "X" ? 800 : 600, 0.1); }
+        function aiMove() {
+            if (!gameActive || isRevealed) return;
+            let move = board.filter(v => v === "X").length === 0 ? 4 : getBestNotaktoMove(board);
+            if (move !== -1) {
+                makeMove(move);
+                setTimeout(() => { if (checkLose(board)) triggerReveal("Human"); else { currentPlayer = "X"; gameStatus.innerText = "Your Turn (Avoid 3-in-a-row)"; } }, 300);
             }
         }
-
-        function makeMove(index) {
-            board[index] = "X"; cells[index].innerText = "X"; cells[index].classList.add('marked');
-            playSound(currentPlayer === "X" ? 800 : 600, 0.1);
-        }
-
-        function aiMove() {
-            if (!gameActive) return;
-            let move = -1;
-            if (board.filter(v => v === "X").length === 0) move = 4;
-            else move = getBestNotaktoMove(board);
-            if (move !== -1) makeMove(move);
-            if (checkLose(board)) triggerReveal("Human");
-            else { currentPlayer = "X"; gameStatus.innerText = "Your Turn (Avoid 3-in-a-row)"; }
-        }
-
         function getBestNotaktoMove(cb) {
-            let safeMoves = [];
+            let bestScore = -Infinity; let move = -1;
             for (let i = 0; i < 9; i++) {
                 if (cb[i] === "") {
-                    let tb = [...cb]; tb[i] = "X";
-                    if (!checkLose(tb)) safeMoves.push(i);
+                    let tb = [...cb]; tb[i] = "X"; if (checkLose(tb)) continue;
+                    let hsm = 0; for (let j = 0; j < 9; j++) { if (tb[j] === "") { let nb = [...tb]; nb[j] = "X"; if (!checkLose(nb)) hsm++; } }
+                    let score = -hsm; if (score > bestScore) { bestScore = score; move = i; }
                 }
             }
-            return safeMoves.length > 0 ? safeMoves[Math.floor(Math.random() * safeMoves.length)] : cb.findIndex(v => v === "");
+            return move === -1 ? cb.findIndex(v => v === "") : move;
         }
-
         function checkLose(cb) { return winConditions.some(c => c.every(i => cb[i] === "X")); }
-
         cells.forEach(cell => cell.addEventListener('click', handleCellClick));
         startBtn.addEventListener('click', async () => { await initAudio(); runToss(); });
-
-        let resetTimer;
-        stage.addEventListener('pointerdown', () => { if (isRevealed) resetTimer = setTimeout(() => location.reload(), 2000); });
+        let resetTimer; stage.addEventListener('pointerdown', () => { if (isRevealed) resetTimer = setTimeout(() => location.reload(), 2000); });
         stage.addEventListener('pointerup', () => clearTimeout(resetTimer));
     </script>
 </body>

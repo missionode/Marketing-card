@@ -1,8 +1,14 @@
-const CACHE_NAME = 'magic-card-v1';
+const CACHE_NAME = 'magic-card-v2';
 const ASSETS = [
   'index.html',
   'manifest.json',
-  'Marketing card.png'
+  'Marketing card.png',
+  'android-chrome-192x192.png',
+  'android-chrome-512x512.png',
+  'apple-touch-icon.png',
+  'favicon-16x16.png',
+  'favicon-32x32.png',
+  'favicon.ico'
 ];
 
 self.addEventListener('install', (event) => {
