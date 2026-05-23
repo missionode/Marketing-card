@@ -3,7 +3,7 @@
   "short_name": "MagicCard",
   "description": "A magical marketing reveal experience.",
   "start_url": "index.html",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
   "orientation": "portrait",

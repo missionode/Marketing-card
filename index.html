@@ -11,18 +11,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
         :root {
-            /* Base Palette */
             --pearl-white: #F8F9FA;
             --mist-grey: #E9ECEF;
             --soft-silver: #DEE2E6;
-            
-            /* Accent Gradients (Iridescent & Soft) */
             --violet: #8B5CF6;
             --lavender: #C4B5FD;
             --magenta: #D946EF;
             --cyan: #22D3EE;
-            
-            /* Typography */
             --deep-indigo: #1E1B4B;
         }
 
@@ -59,78 +54,120 @@
             left: 0;
             width: 100%;
             height: 100%;
-            filter: url('#liquid-mercury'); /* Organic Gooey Filter */
+            filter: url('#liquid-mercury');
             z-index: 10;
-            transition: opacity 0.6s ease;
+            transition: opacity 0.8s ease;
         }
 
-        .blob {
+        .background-blob {
             position: absolute;
-            width: 500px; /* Larger blobs for better mixing */
-            height: 500px;
+            width: 600px;
+            height: 600px;
             border-radius: 50%;
-            opacity: 0.5;
-            mix-blend-mode: multiply; /* Natural blending on white */
+            opacity: 0.3;
+            mix-blend-mode: multiply;
         }
 
-        #blob-1 { background: radial-gradient(circle, var(--violet) 0%, transparent 70%); }
-        #blob-2 { background: radial-gradient(circle, var(--lavender) 0%, transparent 70%); }
-        #blob-3 { background: radial-gradient(circle, var(--magenta) 0%, transparent 70%); }
-        #blob-4 { background: radial-gradient(circle, var(--cyan) 0%, transparent 70%); }
-
-        /* --- TIC TAC TOE GAME --- */
+        /* --- THE PARTICLE TRAP GAME --- */
         #game-overlay {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: 20;
-            width: 300px;
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            transition: opacity 0.5s ease;
         }
 
-        #ttt-board {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            gap: 12px;
-            width: 100%;
-            aspect-ratio: 1;
-            margin-bottom: 30px;
+        #particle-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            width: 90%;
+            max-width: 400px;
+            gap: 15px;
+            margin-bottom: 40px;
+            perspective: 1000px;
         }
 
-        .cell {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(30, 27, 75, 0.1);
-            border-radius: 16px;
+        .particle {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1), inset 0 -5px 15px rgba(30, 27, 75, 0.1);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 40px;
-            font-weight: 900;
-            color: var(--deep-indigo);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.8);
         }
 
-        .cell:active {
-            background: rgba(255, 255, 255, 0.7);
-            transform: scale(0.95);
+        .particle::after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 60%;
+            background: radial-gradient(circle, var(--cyan), transparent);
+            border-radius: 50%;
+            opacity: 0.4;
         }
 
-        .game-status {
+        .particle.selected {
+            transform: scale(1.2);
+            box-shadow: 0 0 30px var(--cyan);
+            border-color: var(--cyan);
+        }
+
+        .particle.removed {
+            transform: scale(0) rotate(180deg);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .game-controls {
+            text-align: center;
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(15px);
+            padding: 20px 40px;
+            border-radius: 30px;
+            border: 1px solid rgba(30, 27, 75, 0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        }
+
+        .status-text {
             font-size: 14px;
             font-weight: 800;
             color: var(--deep-indigo);
             text-transform: uppercase;
-            letter-spacing: 3px;
-            opacity: 0.6;
-            text-align: center;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .take-btn {
+            background: var(--deep-indigo);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.3s ease;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .take-btn.active {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         /* --- PRESTIGE --- */
@@ -181,20 +218,21 @@
             justify-content: center; align-items: center;
             color: var(--deep-indigo);
             text-align: center;
-            transition: opacity 0.5s ease;
+            padding: 40px;
         }
 
-        button {
+        #start-screen button {
             background: var(--deep-indigo);
-            color: white; border: none;
-            padding: 22px 60px; border-radius: 100px;
-            font-size: 18px; font-weight: 700;
-            cursor: pointer; margin-top: 40px;
+            color: white;
+            border: none;
+            padding: 20px 60px;
+            border-radius: 100px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 40px;
             box-shadow: 0 15px 35px rgba(30, 27, 75, 0.2);
-            transition: transform 0.2s ease;
         }
-
-        button:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -203,40 +241,35 @@
     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display:none">
         <defs>
             <filter id="liquid-mercury">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="30" result="blur" />
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10" result="goo" />
+                <feGaussianBlur in="SourceGraphic" stdDeviation="40" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -15" result="goo" />
                 <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
             </filter>
         </defs>
     </svg>
 
     <div id="start-screen">
-        <h2 style="font-size: 36px; font-weight: 900; letter-spacing: -1px; margin-bottom: 12px;">The Magic Match</h2>
-        <p style="opacity: 0.5; font-size: 16px; font-weight: 500;">Win a game of Tic Tac Toe to reveal the secret.</p>
+        <h2 style="font-size: 36px; font-weight: 900; letter-spacing: -1px; margin-bottom: 12px;">The Particle Trap</h2>
+        <p style="opacity: 0.6; font-size: 16px; line-height: 1.5;">Take 1, 2, or 3 particles.<br>The player forced to take the <b>last</b> particle loses.</p>
         <button id="start-btn">Start Game</button>
     </div>
 
     <div id="stage">
         <div id="pledge">
-            <div id="blob-1" class="blob"></div>
-            <div id="blob-2" class="blob"></div>
-            <div id="blob-3" class="blob"></div>
-            <div id="blob-4" class="blob"></div>
+            <div id="blob-1" class="background-blob"></div>
+            <div id="blob-2" class="background-blob"></div>
+            <div id="blob-3" class="background-blob"></div>
+            <div id="blob-4" class="background-blob"></div>
         </div>
 
         <div id="game-overlay">
-            <div id="ttt-board">
-                <div class="cell" data-index="0"></div>
-                <div class="cell" data-index="1"></div>
-                <div class="cell" data-index="2"></div>
-                <div class="cell" data-index="3"></div>
-                <div class="cell" data-index="4"></div>
-                <div class="cell" data-index="5"></div>
-                <div class="cell" data-index="6"></div>
-                <div class="cell" data-index="7"></div>
-                <div class="cell" data-index="8"></div>
+            <div id="particle-container">
+                <!-- 15 Particles -->
             </div>
-            <div id="game-status" class="game-status">Your Turn (X)</div>
+            <div class="game-controls">
+                <div id="status" class="status-text">AI is thinking...</div>
+                <button id="take-btn" class="take-btn">Take Selected</button>
+            </div>
         </div>
         
         <div id="prestige">
@@ -254,68 +287,99 @@
         const startBtn = document.getElementById('start-btn');
         const startScreen = document.getElementById('start-screen');
         const gameOverlay = document.getElementById('game-overlay');
-        const gameStatus = document.getElementById('game-status');
-        const cells = document.querySelectorAll('.cell');
-        const blobs = document.querySelectorAll('.blob');
+        const particleContainer = document.getElementById('particle-container');
+        const statusText = document.getElementById('status');
+        const takeBtn = document.getElementById('take-btn');
+        const backgroundBlobs = document.querySelectorAll('.background-blob');
 
         let audioCtx;
         let isRevealed = false;
-        let board = ["", "", "", "", "", "", "", "", ""];
-        let gameActive = true;
-        let currentPlayer = "O"; // AI starts first
+        let particles = [];
+        let selectedCount = 0;
+        let totalParticles = 15;
+        let currentPlayer = 'O'; // AI starts
 
-        // --- LIQUID BLOBS PHYSICS ---
-        const points = Array.from(blobs).map(() => ({
-            x: Math.random() * 100,
-            y: Math.random() * 100,
-            vx: (Math.random() - 0.5) * 0.6,
-            vy: (Math.random() - 0.5) * 0.6,
-            sin: Math.random() * Math.PI, // Initial angle for swirling
-            speed: 0.02 + Math.random() * 0.03
-        }));
+        // --- BACKGROUND PHYSICS ---
+        const points = Array.from(backgroundBlobs).map((blob, i) => {
+            const colors = [getComputedStyle(document.documentElement).getPropertyValue('--violet'), 
+                          getComputedStyle(document.documentElement).getPropertyValue('--lavender'),
+                          getComputedStyle(document.documentElement).getPropertyValue('--magenta'),
+                          getComputedStyle(document.documentElement).getPropertyValue('--cyan')];
+            blob.style.background = `radial-gradient(circle, ${colors[i]}, transparent 70%)`;
+            return {
+                x: Math.random() * 100,
+                y: Math.random() * 100,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                sin: Math.random() * Math.PI,
+                speed: 0.02 + Math.random() * 0.03
+            };
+        });
 
-        function animateBlobs() {
+        function animateBackground() {
             if (isRevealed) return;
             points.forEach((p, i) => {
-                // Add a swirling, non-linear drift
                 p.sin += p.speed;
-                const swirlX = Math.sin(p.sin) * 0.2;
-                const swirlY = Math.cos(p.sin) * 0.2;
-
-                p.x += p.vx + swirlX; 
-                p.y += p.vy + swirlY;
-
+                p.x += p.vx + Math.sin(p.sin) * 0.2;
+                p.y += p.vy + Math.cos(p.sin) * 0.2;
                 if (p.x < -10 || p.x > 110) p.vx *= -1;
                 if (p.y < -10 || p.y > 110) p.vy *= -1;
-                
-                blobs[i].style.left = p.x + '%';
-                blobs[i].style.top = p.y + '%';
+                backgroundBlobs[i].style.left = p.x + '%';
+                backgroundBlobs[i].style.top = p.y + '%';
             });
-            requestAnimationFrame(animateBlobs);
+            requestAnimationFrame(animateBackground);
         }
 
         async function initAudio() {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
 
+        function playSound(freq, duration = 0.1, type = 'sine') {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(g); g.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function createParticles() {
+            for (let i = 0; i < totalParticles; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.dataset.index = i;
+                p.addEventListener('click', () => handleParticleClick(p));
+                particleContainer.appendChild(p);
+                particles.push(p);
+            }
+        }
+
+        function handleParticleClick(p) {
+            if (currentPlayer !== 'X' || p.classList.contains('removed')) return;
+
+            if (p.classList.contains('selected')) {
+                p.classList.remove('selected');
+                selectedCount--;
+            } else if (selectedCount < 3) {
+                p.classList.add('selected');
+                selectedCount++;
+                playSound(800, 0.05);
+            }
+
+            takeBtn.className = selectedCount > 0 ? 'take-btn active' : 'take-btn';
+        }
+
         function triggerReveal() {
             if (isRevealed) return;
             isRevealed = true;
             gameOverlay.style.opacity = '0';
-            gameOverlay.style.transform = 'translate(-50%, -50%) scale(0.9)';
-
-            // Success Harmony
-            const osc1 = audioCtx.createOscillator();
-            const osc2 = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
-            osc1.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-            osc2.frequency.setValueAtTime(659.25, audioCtx.currentTime); // E5
-            g.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-            osc1.connect(g); osc2.connect(g); g.connect(audioCtx.destination);
-            osc1.start(); osc2.start(); 
-            osc1.stop(audioCtx.currentTime + 0.5); osc2.stop(audioCtx.currentTime + 0.5);
-
+            
+            playSound(523, 0.4, 'triangle');
+            playSound(659, 0.4, 'sine');
+            
             flash.classList.add('flash-anim');
             setTimeout(() => {
                 pledge.style.opacity = '0';
@@ -323,137 +387,70 @@
             }, 50);
         }
 
-        // --- TIC TAC TOE LOGIC (MINIMAX - UNBEATABLE) ---
-        const winConditions = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8],
-            [0, 3, 6], [1, 4, 7], [2, 5, 8],
-            [0, 4, 8], [2, 4, 6]
-        ];
+        function removeSelected() {
+            const selected = document.querySelectorAll('.particle.selected');
+            selected.forEach(p => {
+                p.classList.remove('selected');
+                p.classList.add('removed');
+            });
+            totalParticles -= selected.length;
+            selectedCount = 0;
+            takeBtn.className = 'take-btn';
+            playSound(400, 0.2, 'square');
 
-        function handleCellClick(e) {
-            const index = e.target.getAttribute('data-index');
-            if (board[index] !== "" || !gameActive || currentPlayer !== "X" || isRevealed) return;
-
-            makeMove(index, "X");
-            if (checkWin(board, "X")) {
-                gameStatus.innerText = "Human Insight Wins!";
-                setTimeout(triggerReveal, 1000);
-            } else if (board.every(cell => cell !== "")) {
-                gameStatus.innerText = "The Perfect Balance.";
+            if (totalParticles <= 1) {
+                statusText.innerText = currentPlayer === 'X' ? "AI Analysis Complete." : "Human Pattern Detected.";
                 setTimeout(triggerReveal, 1000);
             } else {
-                currentPlayer = "O";
-                gameStatus.innerText = "AI Processing...";
-                setTimeout(aiMove, 600);
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                if (currentPlayer === 'O') {
+                    statusText.innerText = "AI Processing...";
+                    setTimeout(aiMove, 1000);
+                } else {
+                    statusText.innerText = "Your Turn (Take 1-3)";
+                }
             }
-        }
-
-        function makeMove(index, player) {
-            board[index] = player;
-            cells[index].innerText = player;
-            cells[index].style.opacity = "1";
-            
-            const clickOsc = audioCtx.createOscillator();
-            const clickGain = audioCtx.createGain();
-            clickOsc.frequency.setValueAtTime(player === "X" ? 800 : 600, audioCtx.currentTime);
-            clickGain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            clickGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            clickOsc.connect(clickGain); clickGain.connect(audioCtx.destination);
-            clickOsc.start(); clickOsc.stop(audioCtx.currentTime + 0.1);
         }
 
         function aiMove() {
-            if (!gameActive || isRevealed) return;
-            
-            let move = getBestMinimaxMove(board);
-            if (move !== null) {
-                makeMove(move, "O");
+            // Unbeatable Nim Strategy (Misere play)
+            // Goal: Leave (4n + 1) particles for the player.
+            // Current total: totalParticles
+            let target = 0;
+            if (totalParticles > 13) target = 13;
+            else if (totalParticles > 9) target = 9;
+            else if (totalParticles > 5) target = 5;
+            else target = 1;
+
+            let numToTake = totalParticles - target;
+            if (numToTake < 1) numToTake = 1;
+            if (numToTake > 3) numToTake = 3;
+
+            const available = particles.filter(p => !p.classList.contains('removed'));
+            for (let i = 0; i < numToTake; i++) {
+                available[i].classList.add('selected');
             }
-            
-            if (checkWin(board, "O")) {
-                gameStatus.innerText = "AI Precision Wins!";
-                setTimeout(triggerReveal, 1000);
-            } else if (board.every(cell => cell !== "")) {
-                gameStatus.innerText = "The Perfect Balance.";
-                setTimeout(triggerReveal, 1000);
-            } else {
-                currentPlayer = "X";
-                gameStatus.innerText = "Your Turn (X)";
-            }
+
+            setTimeout(removeSelected, 800);
         }
 
-        function getBestMinimaxMove(currentBoard) {
-            let bestScore = -Infinity;
-            let move = null;
-            for (let i = 0; i < 9; i++) {
-                if (currentBoard[i] === "") {
-                    currentBoard[i] = "O";
-                    let score = minimax(currentBoard, 0, false);
-                    currentBoard[i] = "";
-                    if (score > bestScore) {
-                        bestScore = score;
-                        move = i;
-                    }
-                }
-            }
-            return move;
-        }
-
-        function minimax(currentBoard, depth, isMaximizing) {
-            if (checkWin(currentBoard, "O")) return 10 - depth;
-            if (checkWin(currentBoard, "X")) return depth - 10;
-            if (currentBoard.every(cell => cell !== "")) return 0;
-
-            if (isMaximizing) {
-                let bestScore = -Infinity;
-                for (let i = 0; i < 9; i++) {
-                    if (currentBoard[i] === "") {
-                        currentBoard[i] = "O";
-                        let score = minimax(currentBoard, depth + 1, false);
-                        currentBoard[i] = "";
-                        bestScore = Math.max(score, bestScore);
-                    }
-                }
-                return bestScore;
-            } else {
-                let bestScore = Infinity;
-                for (let i = 0; i < 9; i++) {
-                    if (currentBoard[i] === "") {
-                        currentBoard[i] = "X";
-                        let score = minimax(currentBoard, depth + 1, true);
-                        currentBoard[i] = "";
-                        bestScore = Math.min(score, bestScore);
-                    }
-                }
-                return bestScore;
-            }
-        }
-
-        function checkWin(currentBoard, player) {
-            return winConditions.some(condition => {
-                return condition.every(index => currentBoard[index] === player);
-            });
-        }
-
-        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        takeBtn.addEventListener('click', removeSelected);
 
         startBtn.addEventListener('click', async () => {
-            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
             await initAudio();
-            animateBlobs();
+            createParticles();
+            animateBackground();
             startScreen.style.opacity = '0';
             setTimeout(() => {
                 startScreen.style.display = 'none';
-                gameStatus.innerText = "AI Processing...";
-                setTimeout(aiMove, 600); // AI takes the first move
+                aiMove(); // AI starts
             }, 500);
         });
 
+        // Reset
         let resetTimer;
         stage.addEventListener('pointerdown', () => {
-            if (isRevealed) {
-                resetTimer = setTimeout(() => location.reload(), 2000);
-            }
+            if (isRevealed) resetTimer = setTimeout(() => location.reload(), 2000);
         });
         stage.addEventListener('pointerup', () => clearTimeout(resetTimer));
     </script>
