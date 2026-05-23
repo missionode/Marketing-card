@@ -6,6 +6,7 @@
     <title>Magic Card Reveal</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
     <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,263 +22,207 @@
             --deep-indigo: #1E1B4B;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body, html { 
+            width: 100%; height: 100%; overflow: hidden; 
+            background-color: var(--pearl-white); 
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            color: var(--deep-indigo); 
         }
 
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: var(--pearl-white);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: var(--deep-indigo);
-        }
-
-        #stage {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        #stage { 
+            width: 100%; height: 100%; position: relative; 
+            display: flex; justify-content: center; align-items: center; 
             overflow: hidden;
             background: radial-gradient(circle at center, var(--pearl-white) 0%, var(--mist-grey) 100%);
         }
 
-        /* --- LIQUID MERCURY MESH --- */
-        #pledge {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            filter: url('#liquid-mercury');
-            z-index: 10;
-            transition: opacity 0.8s ease;
+        /* --- GLOBAL AMBIENT FLUID BACKGROUND --- */
+        #pledge { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            filter: url('#liquid-mercury'); z-index: 1; 
+            transition: opacity 1.2s ease;
         }
 
         .background-blob {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            opacity: 0.25;
-            mix-blend-mode: multiply;
+            position: absolute; width: 600px; height: 600px; border-radius: 50%;
+            opacity: 0.4; mix-blend-mode: multiply;
         }
 
-        /* --- THE PREDICTION GAME --- */
-        #game-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 20;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            transition: opacity 0.5s ease;
-        }
-
-        #prediction-card {
-            width: 180px;
-            height: 240px;
+        /* --- SHARED GLASSMORPHIC UI --- */
+        .glass-card {
             background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 24px;
-            box-shadow: 0 30px 60px rgba(30, 27, 75, 0.1);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 50px;
-            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
-            position: relative;
-            transform-style: preserve-3d;
-        }
-
-        #prediction-card.revealing {
-            transform: rotateY(180deg) scale(1.1);
-            box-shadow: 0 40px 80px rgba(30, 27, 75, 0.2);
-        }
-
-        .card-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border-radius: 24px;
-        }
-
-        .card-back {
-            background: linear-gradient(135deg, var(--violet), var(--cyan));
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .card-back .icon {
-            font-size: 50px;
-            margin-bottom: 10px;
-        }
-
-        .card-back .text {
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.8;
-        }
-
-        .card-front {
-            background: white;
-            transform: rotateY(180deg);
-            padding: 20px;
-        }
-
-        .card-front .icon {
-            font-size: 80px;
-            margin-bottom: 15px;
-        }
-
-        .card-front .text {
-            font-size: 14px;
-            font-weight: 900;
-            color: var(--violet);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        #options-container {
-            display: flex;
-            gap: 15px;
-            width: 100%;
-            max-width: 340px;
-        }
-
-        .option-btn {
-            flex: 1;
-            aspect-ratio: 1;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(40px) saturate(1.8);
+            -webkit-backdrop-filter: blur(40px) saturate(1.8);
             border: 1px solid rgba(255, 255, 255, 0.8);
-            border-radius: 20px;
+            border-radius: 40px;
+            padding: 48px 32px;
+            box-shadow: 
+                0 30px 60px rgba(30, 27, 75, 0.12),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+            width: 92%;
+            max-width: 380px;
+            z-index: 10;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        }
-
-        .option-btn:active {
-            transform: scale(0.92);
-            background: white;
-        }
-
-        .option-btn .icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .option-btn .label {
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.6;
-        }
-
-        .game-status {
-            margin-top: 40px;
-            font-size: 14px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            opacity: 0.5;
             text-align: center;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* --- PRESTIGE --- */
-        #prestige {
+        .glass-card::before {
+            content: '';
             position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transform: scale(0.9) translateY(40px);
-            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease;
-        }
-
-        #prestige img {
-            max-width: 85%;
-            max-height: 80%;
-            object-fit: contain;
-            border-radius: 20px;
-            box-shadow: 0 40px 80px rgba(30, 27, 75, 0.25);
-        }
-
-        #prestige.active {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-        }
-
-        #flash {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: white;
-            z-index: 100;
-            opacity: 0;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 40%, rgba(255,255,255,0.2) 60%, transparent 100%);
+            transform: rotate(-15deg);
             pointer-events: none;
         }
 
-        .flash-anim { animation: flash-pulse 0.4s ease-out forwards; }
-        @keyframes flash-pulse { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }
-
-        #start-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 200;
-            background: var(--pearl-white);
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            color: var(--deep-indigo);
-            text-align: center;
-            padding: 40px;
-        }
-
-        #start-screen button {
+        .primary-btn {
             background: var(--deep-indigo);
             color: white;
             border: none;
-            padding: 20px 60px;
+            padding: 20px 48px;
             border-radius: 100px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             cursor: pointer;
-            margin-top: 40px;
-            box-shadow: 0 15px 35px rgba(30, 27, 75, 0.2);
+            box-shadow: 0 12px 30px rgba(30, 27, 75, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 32px;
         }
+
+        .primary-btn:active { transform: scale(0.96); box-shadow: 0 6px 15px rgba(30, 27, 75, 0.2); }
+
+        /* --- NOTAKTO GAME BOARD --- */
+        #game-overlay { 
+            position: absolute; width: 100%; height: 100%; 
+            display: none; flex-direction: column; justify-content: center; align-items: center; 
+            padding: 20px; z-index: 10;
+        }
+
+        #ttt-board { 
+            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 12px; 
+            width: 100%; max-width: 300px; aspect-ratio: 1; margin-bottom: 32px;
+        }
+
+        .cell { 
+            background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 40px; font-weight: 900; color: var(--deep-indigo); 
+            cursor: pointer; transition: all 0.25s ease;
+        }
+
+        .cell.marked { 
+            background: white; color: var(--magenta); 
+            box-shadow: 0 10px 25px rgba(217, 70, 239, 0.2); transform: scale(1.05); 
+        }
+
+        /* --- TOSS UI --- */
+        #toss-screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            z-index: 250; background: transparent; display: none; 
+            flex-direction: column; justify-content: center; align-items: center; 
+            transition: opacity 0.6s ease;
+        }
+
+        .coin-container { width: 140px; height: 140px; perspective: 1200px; margin-bottom: 60px; position: relative; }
+        .coin { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg); }
+        .coin-side {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 28px; font-weight: 900; border: 6px solid #fff;
+            background: white; box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+        }
+        .coin-ai { background: linear-gradient(135deg, var(--violet), var(--cyan)); color: white; transform: translateZ(2px); }
+        .coin-human { transform: rotateY(180deg) translateZ(2px); color: var(--magenta); }
+        .coin-shadow { position: absolute; bottom: -30px; left: 50%; width: 100px; height: 15px; background: rgba(0,0,0,0.1); border-radius: 50%; filter: blur(8px); transform: translateX(-50%) scale(1); transition: all 0.8s ease; pointer-events: none; }
+        
+        .toss-up { animation: coin-toss-arc 2.5s cubic-bezier(0.1, 0, 0.3, 1) forwards; }
+        @keyframes coin-toss-arc { 0% { transform: translateY(0); } 30% { transform: translateY(-300px); } 100% { transform: translateY(0); } }
+        .coin-flip { animation: coin-spin 2.5s cubic-bezier(0.1, 0, 0.3, 1) forwards; }
+        @keyframes coin-spin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(var(--final-rotation-y)); } }
+
+        /* --- WINNER ANNOUNCEMENT --- */
+        #winner-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 500;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(50px) saturate(2);
+            transition: opacity 0.5s ease;
+        }
+
+        #winner-screen h2 {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--deep-indigo);
+            opacity: 0.6;
+            margin-bottom: 10px;
+        }
+
+        #winner-name {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1;
+            color: var(--magenta);
+            text-shadow: 0 10px 30px rgba(217, 70, 239, 0.3);
+        }
+
+        /* --- PRESTIGE --- */
+        #prestige { 
+            position: absolute; width: 100%; height: 100%; z-index: 100; 
+            display: flex; justify-content: center; align-items: center; 
+            opacity: 0; transform: scale(0.9) translateY(40px); visibility: hidden;
+            transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease; 
+        }
+        #prestige img { max-width: 95%; max-height: 90%; object-fit: contain; border-radius: 24px; box-shadow: 0 40px 100px rgba(30, 27, 75, 0.3); }
+        #prestige.active { opacity: 1; transform: scale(1) translateY(0); visibility: visible; }
+
+        #flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; opacity: 0; pointer-events: none; }
+        .flash-anim { animation: flash-pulse 0.5s ease-out forwards; }
+        @keyframes flash-pulse { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }
+
+        #start-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 200;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.8s ease;
+        }
+
+        .badge {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--violet);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+        }
+
+        h1 { font-size: 32px; font-weight: 900; letter-spacing: -1px; line-height: 1.1; margin-bottom: 16px; }
+        .intro-text { font-size: 15px; line-height: 1.6; opacity: 0.7; font-weight: 500; margin-bottom: 8px; }
+        
+        .game-status { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; opacity: 0.5; margin-top: 16px; transition: all 0.3s ease; }
     </style>
 </head>
 <body>
-
-    <!-- SVG Liquid Mercury Filter -->
     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display:none">
         <defs>
             <filter id="liquid-mercury">
@@ -288,12 +233,6 @@
         </defs>
     </svg>
 
-    <div id="start-screen">
-        <h2 style="font-size: 36px; font-weight: 900; letter-spacing: -1px; margin-bottom: 12px;">The Prediction</h2>
-        <p style="opacity: 0.6; font-size: 16px; line-height: 1.5; max-width: 280px;">The AI has already made its move.<br>Can you beat the machine?</p>
-        <button id="start-btn">Start Game</button>
-    </div>
-
     <div id="stage">
         <div id="pledge">
             <div id="blob-1" class="background-blob"></div>
@@ -302,34 +241,42 @@
             <div id="blob-4" class="background-blob"></div>
         </div>
 
+        <div id="start-screen">
+            <div class="glass-card">
+                <div class="badge">AI Intelligence Demo</div>
+                <h1>Notakto Avoidance</h1>
+                <p class="intro-text">Challenge the machine in a game of pure foresight.</p>
+                <p class="intro-text" style="font-size: 13px; font-weight: 700;">RULES: Both players use X. The first to make 3-in-a-row loses.</p>
+                <button id="start-btn" class="primary-btn">Begin Match</button>
+            </div>
+        </div>
+
+        <div id="toss-screen">
+            <div class="glass-card">
+                <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 40px; letter-spacing: 1px;">DECIDING INITIATIVE</h2>
+                <div class="coin-container">
+                    <div id="coin" class="coin">
+                        <div class="coin-side coin-ai">AI</div>
+                        <div class="coin-side coin-human">YOU</div>
+                    </div>
+                    <div id="coin-shadow" class="coin-shadow"></div>
+                </div>
+                <p id="toss-result" style="font-size: 13px; font-weight: 800; opacity: 0.5; text-transform: uppercase; letter-spacing: 2px;">Flipping...</p>
+            </div>
+        </div>
+
         <div id="game-overlay">
-            <div id="prediction-card">
-                <div class="card-face card-back">
-                    <div class="icon">✨</div>
-                    <div class="text">AI Prediction</div>
-                </div>
-                <div class="card-face card-front">
-                    <div id="prediction-icon" class="icon">💎</div>
-                    <div id="prediction-text" class="text">Rock</div>
-                </div>
+            <div id="ttt-board">
+                <div class="cell" data-index="0"></div><div class="cell" data-index="1"></div><div class="cell" data-index="2"></div>
+                <div class="cell" data-index="3"></div><div class="cell" data-index="4"></div><div class="cell" data-index="5"></div>
+                <div class="cell" data-index="6"></div><div class="cell" data-index="7"></div><div class="cell" data-index="8"></div>
             </div>
+            <div id="game-status" class="game-status">Synchronizing...</div>
+        </div>
 
-            <div id="options-container">
-                <div class="option-btn" data-move="rock">
-                    <div class="icon">💎</div>
-                    <div class="label">Rock</div>
-                </div>
-                <div class="option-btn" data-move="paper">
-                    <div class="icon">📄</div>
-                    <div class="label">Paper</div>
-                </div>
-                <div class="option-btn" data-move="scissors">
-                    <div class="icon">✂️</div>
-                    <div class="label">Scissors</div>
-                </div>
-            </div>
-
-            <div id="game-status" class="game-status">Choose Your Move</div>
+        <div id="winner-screen">
+            <h2>The Match Result</h2>
+            <div id="winner-name">AI PRECISION WINS</div>
         </div>
         
         <div id="prestige">
@@ -340,72 +287,52 @@
     </div>
 
     <script>
-        const stage = document.getElementById('stage');
         const pledge = document.getElementById('pledge');
         const prestige = document.getElementById('prestige');
         const flash = document.getElementById('flash');
         const startBtn = document.getElementById('start-btn');
         const startScreen = document.getElementById('start-screen');
+        const tossScreen = document.getElementById('toss-screen');
+        const coin = document.getElementById('coin');
+        const coinShadow = document.getElementById('coin-shadow');
+        const tossResult = document.getElementById('toss-result');
         const gameOverlay = document.getElementById('game-overlay');
-        const predictionCard = document.getElementById('prediction-card');
-        const predictionIcon = document.getElementById('prediction-icon');
-        const predictionText = document.getElementById('prediction-text');
         const gameStatus = document.getElementById('game-status');
-        const optionBtns = document.querySelectorAll('.option-btn');
+        const winnerScreen = document.getElementById('winner-screen');
+        const winnerName = document.getElementById('winner-name');
+        const cells = document.querySelectorAll('.cell');
         const backgroundBlobs = document.querySelectorAll('.background-blob');
 
         let audioCtx;
         let isRevealed = false;
         let gameActive = true;
+        let board = ["", "", "", "", "", "", "", "", ""];
+        let currentPlayer = ""; 
 
-        const moves = {
-            rock: { icon: '💎', win: 'paper' },
-            paper: { icon: '📄', win: 'scissors' },
-            scissors: { icon: '✂️', win: 'rock' }
-        };
+        const winConditions = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 
-        // --- BACKGROUND PHYSICS ---
         const points = Array.from(backgroundBlobs).map((blob, i) => {
-            const colors = [
-                getComputedStyle(document.documentElement).getPropertyValue('--violet'), 
-                getComputedStyle(document.documentElement).getPropertyValue('--lavender'),
-                getComputedStyle(document.documentElement).getPropertyValue('--magenta'),
-                getComputedStyle(document.documentElement).getPropertyValue('--cyan')
-            ];
+            const colors = ["#8B5CF6", "#C4B5FD", "#D946EF", "#22D3EE"];
             blob.style.background = `radial-gradient(circle, ${colors[i]}, transparent 70%)`;
-            return {
-                x: Math.random() * 100,
-                y: Math.random() * 100,
-                vx: (Math.random() - 0.5) * 0.4,
-                vy: (Math.random() - 0.5) * 0.4,
-                sin: Math.random() * Math.PI,
-                speed: 0.02 + Math.random() * 0.03
-            };
+            return { x: Math.random() * 100, y: Math.random() * 100, vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5, sin: Math.random() * Math.PI, speed: 0.02 + Math.random() * 0.03 };
         });
 
         function animateBackground() {
-            if (isRevealed) return;
             points.forEach((p, i) => {
                 p.sin += p.speed;
-                p.x += p.vx + Math.sin(p.sin) * 0.2;
-                p.y += p.vy + Math.cos(p.sin) * 0.2;
-                if (p.x < -10 || p.x > 110) p.vx *= -1;
-                if (p.y < -10 || p.y > 110) p.vy *= -1;
-                backgroundBlobs[i].style.left = p.x + '%';
-                backgroundBlobs[i].style.top = p.y + '%';
+                p.x += p.vx + Math.sin(p.sin) * 0.25; p.y += p.vy + Math.cos(p.sin) * 0.25;
+                if (p.x < 5 || p.x > 95) p.vx *= -1; if (p.y < 5 || p.y > 95) p.vy *= -1;
+                backgroundBlobs[i].style.left = p.x + '%'; backgroundBlobs[i].style.top = p.y + '%';
             });
             requestAnimationFrame(animateBackground);
         }
+        animateBackground();
 
-        async function initAudio() {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
+        async function initAudio() { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 
-        function playSound(freq, duration = 0.1, type = 'sine') {
+        function playSound(freq, duration = 0.1) {
             if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
-            osc.type = type;
+            const osc = audioCtx.createOscillator(); const g = audioCtx.createGain();
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
             g.gain.setValueAtTime(0.1, audioCtx.currentTime);
             g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
@@ -413,75 +340,121 @@
             osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
-        function triggerReveal() {
-            if (isRevealed) return;
-            isRevealed = true;
-            gameOverlay.style.opacity = '0';
-            
-            playSound(523, 0.4, 'triangle');
-            playSound(659, 0.4, 'sine');
-            
-            flash.classList.add('flash-anim');
-            setTimeout(() => {
-                pledge.style.opacity = '0';
-                prestige.classList.add('active');
-            }, 50);
-        }
-
-        function handleMove(playerMove) {
-            if (!gameActive) return;
+        function triggerReveal(winner) {
+            if (isRevealed) return; isRevealed = true;
             gameActive = false;
 
-            // The Rigged Logic: AI always picks the move that beats the player
-            const aiMove = moves[playerMove].win;
-            const winningInfo = moves[aiMove];
+            // 1. Show Winner Screen
+            winnerName.innerText = winner === "AI" ? "AI PRECISION WINS" : "HUMAN INSIGHT WINS";
+            winnerScreen.style.display = "flex";
+            setTimeout(() => winnerScreen.style.opacity = "1", 10);
 
-            // Set the prediction card
-            predictionIcon.innerText = winningInfo.icon;
-            predictionText.innerText = aiMove;
+            // 2. Play Triumphant Harmony
+            const now = audioCtx.currentTime;
+            const pt = (f, s, d) => {
+                const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                o.type = 'triangle'; o.frequency.setValueAtTime(f, now + s);
+                g.gain.setValueAtTime(0, now + s); g.gain.linearRampToValueAtTime(0.4, now + s + 0.05); g.gain.exponentialRampToValueAtTime(0.01, now + s + d);
+                o.connect(g); g.connect(audioCtx.destination); o.start(now + s); o.stop(now + s + d);
+            };
+            pt(261.63, 0, 1.0); pt(329.63, 0.1, 1.0); pt(392.00, 0.2, 1.0); pt(523.25, 0.3, 1.5);
 
-            playSound(440, 0.2);
-            gameStatus.innerText = "Revealing Prediction...";
-
-            // Start the flip animation
+            // 3. Bright Flash & Final Reveal
             setTimeout(() => {
-                predictionCard.classList.add('revealing');
-                playSound(880, 0.4, 'triangle');
-                
+                flash.classList.add('flash-anim');
                 setTimeout(() => {
-                    gameStatus.innerText = "AI Dominance Confirmed.";
-                    setTimeout(triggerReveal, 1200);
-                }, 800);
-            }, 500);
+                    winnerScreen.style.display = "none";
+                    gameOverlay.style.opacity = '0';
+                    prestige.classList.add('active'); 
+                    pledge.style.opacity = '0.7';
+                }, 100);
+            }, 1800);
         }
 
-        optionBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const move = btn.dataset.move;
-                handleMove(move);
-                
-                // Dim other buttons
-                optionBtns.forEach(b => {
-                    if (b !== btn) b.style.opacity = '0.3';
-                    b.style.pointerEvents = 'none';
-                });
-            });
-        });
-
-        startBtn.addEventListener('click', async () => {
-            await initAudio();
-            animateBackground();
+        async function runToss() {
             startScreen.style.opacity = '0';
             setTimeout(() => {
                 startScreen.style.display = 'none';
-            }, 500);
-        });
+                tossScreen.style.display = 'flex';
+                setTimeout(() => {
+                    const aiWinsToss = Math.random() > 0.4;
+                    const finalY = (5 + Math.floor(Math.random() * 5)) * 180 + (aiWinsToss ? 0 : 180);
+                    document.documentElement.style.setProperty('--final-rotation-y', `${finalY}deg`);
+                    coin.parentElement.classList.add('toss-up'); coin.classList.add('coin-flip');
+                    coinShadow.style.transform = 'translateX(-50%) scale(0.4)'; coinShadow.style.opacity = '0.05';
+                    playSound(440, 0.2);
+                    setTimeout(() => {
+                        tossResult.innerText = aiWinsToss ? "AI INITIATIVE" : "YOUR INITIATIVE";
+                        playSound(aiWinsToss ? 880 : 660, 0.4);
+                        coinShadow.style.transform = 'translateX(-50%) scale(1)'; coinShadow.style.opacity = '0.1';
+                        setTimeout(() => {
+                            tossScreen.style.opacity = '0';
+                            setTimeout(() => {
+                                tossScreen.style.display = 'none';
+                                gameOverlay.style.display = 'flex';
+                                gameOverlay.style.opacity = '1';
+                                currentPlayer = aiWinsToss ? "O" : "X";
+                                if (aiWinsToss) {
+                                    gameStatus.innerText = "AI Processing Initiative...";
+                                    setTimeout(aiMove, 1200); // Clearer initiative for AI
+                                } else {
+                                    gameStatus.innerText = "Your Turn (Avoid 3-in-a-row)";
+                                }
+                            }, 500);
+                        }, 1500);
+                    }, 2500);
+                }, 500);
+            }, 600);
+        }
 
-        // Reset
+        function handleCellClick(e) {
+            const index = e.target.getAttribute('data-index');
+            // Only allow interaction if it's the Human's turn (X)
+            if (board[index] !== "" || !gameActive || currentPlayer !== "X" || isRevealed) return;
+            
+            makeMove(index);
+            if (checkLose(board)) {
+                triggerReveal("AI");
+            } else {
+                currentPlayer = "O";
+                gameStatus.innerText = "AI Calculating Trap...";
+                setTimeout(aiMove, 1000);
+            }
+        }
+
+        function makeMove(index) {
+            board[index] = "X"; cells[index].innerText = "X"; cells[index].classList.add('marked');
+            playSound(currentPlayer === "X" ? 800 : 600, 0.1);
+        }
+
+        function aiMove() {
+            if (!gameActive) return;
+            let move = -1;
+            if (board.filter(v => v === "X").length === 0) move = 4;
+            else move = getBestNotaktoMove(board);
+            if (move !== -1) makeMove(move);
+            if (checkLose(board)) triggerReveal("Human");
+            else { currentPlayer = "X"; gameStatus.innerText = "Your Turn (Avoid 3-in-a-row)"; }
+        }
+
+        function getBestNotaktoMove(cb) {
+            let safeMoves = [];
+            for (let i = 0; i < 9; i++) {
+                if (cb[i] === "") {
+                    let tb = [...cb]; tb[i] = "X";
+                    if (!checkLose(tb)) safeMoves.push(i);
+                }
+            }
+            return safeMoves.length > 0 ? safeMoves[Math.floor(Math.random() * safeMoves.length)] : cb.findIndex(v => v === "");
+        }
+
+        function checkLose(cb) { return winConditions.some(c => c.every(i => cb[i] === "X")); }
+
+        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        startBtn.addEventListener('click', async () => { await initAudio(); runToss(); });
+
         let resetTimer;
-        stage.addEventListener('pointerdown', () => {
-            if (isRevealed) resetTimer = setTimeout(() => location.reload(), 2000);
-        });
+        stage.addEventListener('pointerdown', () => { if (isRevealed) resetTimer = setTimeout(() => location.reload(), 2000); });
         stage.addEventListener('pointerup', () => clearTimeout(resetTimer));
     </script>
 </body>
