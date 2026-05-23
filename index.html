@@ -262,7 +262,7 @@
         let isRevealed = false;
         let board = ["", "", "", "", "", "", "", "", ""];
         let gameActive = true;
-        let currentPlayer = "X";
+        let currentPlayer = "O"; // AI starts first
 
         // --- LIQUID BLOBS PHYSICS ---
         const points = Array.from(blobs).map(() => ({
@@ -313,7 +313,7 @@
             }, 50);
         }
 
-        // --- TIC TAC TOE LOGIC ---
+        // --- TIC TAC TOE LOGIC (MINIMAX - UNBEATABLE) ---
         const winConditions = [
             [0, 1, 2], [3, 4, 5], [6, 7, 8],
             [0, 3, 6], [1, 4, 7], [2, 5, 8],
@@ -322,18 +322,18 @@
 
         function handleCellClick(e) {
             const index = e.target.getAttribute('data-index');
-            if (board[index] !== "" || !gameActive || currentPlayer !== "X") return;
+            if (board[index] !== "" || !gameActive || currentPlayer !== "X" || isRevealed) return;
 
             makeMove(index, "X");
-            if (checkWin("X")) {
-                gameStatus.innerText = "Match Complete!";
-                setTimeout(triggerReveal, 800);
+            if (checkWin(board, "X")) {
+                gameStatus.innerText = "Human Insight Wins!";
+                setTimeout(triggerReveal, 1000);
             } else if (board.every(cell => cell !== "")) {
-                gameStatus.innerText = "Draw! Success.";
-                setTimeout(triggerReveal, 800);
+                gameStatus.innerText = "The Perfect Balance.";
+                setTimeout(triggerReveal, 1000);
             } else {
                 currentPlayer = "O";
-                gameStatus.innerText = "AI Thinking...";
+                gameStatus.innerText = "AI Processing...";
                 setTimeout(aiMove, 600);
             }
         }
@@ -353,25 +353,75 @@
         }
 
         function aiMove() {
-            if (!gameActive) return;
-            let available = board.map((v, i) => v === "" ? i : null).filter(v => v !== null);
-            if (available.length === 0) return;
+            if (!gameActive || isRevealed) return;
             
-            let move = available[Math.floor(Math.random() * available.length)];
-            makeMove(move, "O");
+            let move = getBestMinimaxMove(board);
+            if (move !== null) {
+                makeMove(move, "O");
+            }
             
-            if (checkWin("O")) {
-                gameStatus.innerText = "AI Won! Success.";
-                setTimeout(triggerReveal, 800);
+            if (checkWin(board, "O")) {
+                gameStatus.innerText = "AI Precision Wins!";
+                setTimeout(triggerReveal, 1000);
+            } else if (board.every(cell => cell !== "")) {
+                gameStatus.innerText = "The Perfect Balance.";
+                setTimeout(triggerReveal, 1000);
             } else {
                 currentPlayer = "X";
                 gameStatus.innerText = "Your Turn (X)";
             }
         }
 
-        function checkWin(player) {
+        function getBestMinimaxMove(currentBoard) {
+            let bestScore = -Infinity;
+            let move = null;
+            for (let i = 0; i < 9; i++) {
+                if (currentBoard[i] === "") {
+                    currentBoard[i] = "O";
+                    let score = minimax(currentBoard, 0, false);
+                    currentBoard[i] = "";
+                    if (score > bestScore) {
+                        bestScore = score;
+                        move = i;
+                    }
+                }
+            }
+            return move;
+        }
+
+        function minimax(currentBoard, depth, isMaximizing) {
+            if (checkWin(currentBoard, "O")) return 10 - depth;
+            if (checkWin(currentBoard, "X")) return depth - 10;
+            if (currentBoard.every(cell => cell !== "")) return 0;
+
+            if (isMaximizing) {
+                let bestScore = -Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (currentBoard[i] === "") {
+                        currentBoard[i] = "O";
+                        let score = minimax(currentBoard, depth + 1, false);
+                        currentBoard[i] = "";
+                        bestScore = Math.max(score, bestScore);
+                    }
+                }
+                return bestScore;
+            } else {
+                let bestScore = Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (currentBoard[i] === "") {
+                        currentBoard[i] = "X";
+                        let score = minimax(currentBoard, depth + 1, true);
+                        currentBoard[i] = "";
+                        bestScore = Math.min(score, bestScore);
+                    }
+                }
+                return bestScore;
+            }
+        }
+
+        function checkWin(currentBoard, player) {
             return winConditions.some(condition => {
-                return condition.every(index => board[index] === player);
+                return condition.every(index => currentBoard[index] === player);
             });
         }
 
@@ -382,7 +432,11 @@
             await initAudio();
             animateBlobs();
             startScreen.style.opacity = '0';
-            setTimeout(() => startScreen.style.display = 'none', 500);
+            setTimeout(() => {
+                startScreen.style.display = 'none';
+                gameStatus.innerText = "AI Processing...";
+                setTimeout(aiMove, 600); // AI takes the first move
+            }, 500);
         });
 
         let resetTimer;
