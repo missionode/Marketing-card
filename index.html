@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Magic Card Reveal</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        :root {
+            /* Base Palette */
+            --pearl-white: #F8F9FA;
+            --mist-grey: #E9ECEF;
+            --soft-silver: #DEE2E6;
+            
+            /* Accent Gradients (Iridescent) */
+            --violet: #8B5CF6;
+            --lavender: #C4B5FD;
+            --magenta: #D946EF;
+            --cyan: #22D3EE;
+            
+            /* Typography */
+            --deep-indigo: #1E1B4B;
+            
+            --safe-area-inset-top: env(safe-area-inset-top);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--pearl-white);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--deep-indigo);
+        }
+
+        #stage {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background: radial-gradient(circle at center, var(--pearl-white) 0%, var(--mist-grey) 100%);
+        }
+
+        /* --- THE PLEDGE: HOLOGRAPHIC MESH --- */
+        #pledge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 10;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mesh {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: 
+                radial-gradient(circle at 30% 30%, var(--violet) 0%, transparent 40%),
+                radial-gradient(circle at 70% 20%, var(--lavender) 0%, transparent 40%),
+                radial-gradient(circle at 40% 80%, var(--magenta) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, var(--cyan) 0%, transparent 40%);
+            filter: blur(100px);
+            animation: holographic-move 12s infinite alternate ease-in-out;
+            opacity: 0.35; /* Subtle iridescence */
+        }
+
+        @keyframes holographic-move {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            33% { transform: translate(-5%, 10%) rotate(10deg) scale(1.1); }
+            66% { transform: translate(10%, -5%) rotate(-10deg) scale(0.9); }
+            100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+        }
+
+        .iridescence-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(255,255,255,0.4) 100%);
+            pointer-events: none;
+            z-index: 11;
+        }
+
+        /* --- THE PRESTIGE: THE CARD --- */
+        #prestige {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--pearl-white);
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+        }
+
+        #prestige img {
+            max-width: 90%;
+            max-height: 85%;
+            object-fit: contain;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(30, 27, 75, 0.15); /* Deep Indigo shadow */
+        }
+
+        #prestige.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        /* --- THE TURN: FLASH EFFECT --- */
+        #flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .flash-anim {
+            animation: flash-pulse 0.3s ease-out forwards;
+        }
+
+        @keyframes flash-pulse {
+            0% { opacity: 0; }
+            30% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Fullscreen Prompt */
+        #start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 200;
+            background: var(--pearl-white);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--deep-indigo);
+            text-align: center;
+            padding: 20px;
+        }
+
+        #start-screen h2 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        #start-screen p {
+            opacity: 0.7;
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+
+        button {
+            background: var(--deep-indigo);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 100px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 10px 25px rgba(30, 27, 75, 0.2);
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="start-screen">
+        <h2>The Magical Reveal</h2>
+        <p>Prepare for the transition.<br>Tap to start the experience.</p>
+        <button id="start-btn">Start Experience</button>
+    </div>
+
+    <div id="stage">
+        <div id="pledge">
+            <div class="mesh"></div>
+            <div class="iridescence-overlay"></div>
+        </div>
+        
+        <div id="prestige">
+            <img src="Marketing card.png" alt="Marketing Card">
+        </div>
+
+        <div id="flash"></div>
+    </div>
+
+    <script>
+        const stage = document.getElementById('stage');
+        const pledge = document.getElementById('pledge');
+        const prestige = document.getElementById('prestige');
+        const flash = document.getElementById('flash');
+        const startBtn = document.getElementById('start-btn');
+        const startScreen = document.getElementById('start-screen');
+
+        let audioCtx;
+        let analyser;
+        let microphone;
+        let isRevealed = false;
+
+        // --- OPTIMIZED SNAP DETECTION ---
+        // Snaps are high-frequency bursts (clicky).
+        // We look for a spike in the 5kHz - 10kHz range.
+        const FREQ_THRESHOLD = 50; // Sensitivity for high-freq spike
+        const VOL_THRESHOLD = 0.15; // Minimum total volume
+        const COOLDOWN = 1200; 
+        let lastDetectionTime = 0;
+
+        async function initAudio() {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false
+                    } 
+                });
+                microphone = audioCtx.createMediaStreamSource(stream);
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 1024; // Better frequency resolution
+                microphone.connect(analyser);
+                
+                detectSnap();
+            } catch (err) {
+                console.error("Mic access denied.", err);
+            }
+        }
+
+        function detectSnap() {
+            if (isRevealed) return;
+
+            const freqData = new Uint8Array(analyser.frequencyBinCount);
+            const timeData = new Float32Array(analyser.fftSize);
+            
+            analyser.getByteFrequencyData(freqData);
+            analyser.getFloatTimeDomainData(timeData);
+
+            // 1. Check Volume (Peak Amplitude)
+            let peak = 0;
+            for (let i = 0; i < timeData.length; i++) {
+                const abs = Math.abs(timeData[i]);
+                if (abs > peak) peak = abs;
+            }
+
+            // 2. Check High Frequencies (The "Click")
+            // Bin index for ~5kHz-8kHz
+            let highFreqSum = 0;
+            const startBin = Math.floor(5000 / (audioCtx.sampleRate / analyser.fftSize));
+            const endBin = Math.floor(8000 / (audioCtx.sampleRate / analyser.fftSize));
+            
+            for (let i = startBin; i <= endBin; i++) {
+                highFreqSum += freqData[i];
+            }
+            const highFreqAvg = highFreqSum / (endBin - startBin + 1);
+
+            const now = Date.now();
+            // A snap is high peak + high frequency spike
+            if (peak > VOL_THRESHOLD && highFreqAvg > FREQ_THRESHOLD && (now - lastDetectionTime) > COOLDOWN) {
+                lastDetectionTime = now;
+                triggerReveal();
+            }
+
+            requestAnimationFrame(detectSnap);
+        }
+
+        function playSnap() {
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            // Clean high-impact digital click
+            const click = audioCtx.createOscillator();
+            const clickGain = audioCtx.createGain();
+            click.type = 'sine';
+            click.frequency.setValueAtTime(1200, audioCtx.currentTime);
+            click.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+            clickGain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+            clickGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            click.connect(clickGain);
+            clickGain.connect(audioCtx.destination);
+            click.start();
+            click.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function triggerReveal() {
+            if (isRevealed) return;
+            isRevealed = true;
+
+            playSnap();
+            flash.classList.add('flash-anim');
+            
+            setTimeout(() => {
+                pledge.style.opacity = '0';
+                prestige.classList.add('active');
+            }, 50);
+
+            setTimeout(() => {
+                flash.classList.remove('flash-anim');
+            }, 350);
+        }
+
+        startBtn.addEventListener('click', async () => {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            }
+
+            await initAudio();
+            startScreen.style.opacity = '0';
+            setTimeout(() => startScreen.style.display = 'none', 300);
+        });
+
+        let resetTimer;
+
+        function resetTrick() {
+            isRevealed = false;
+            pledge.style.opacity = '1';
+            prestige.classList.remove('active');
+            if (analyser) detectSnap();
+        }
+
+        stage.addEventListener('pointerdown', (e) => {
+            if (startScreen.style.display === 'none') {
+                if (!isRevealed) {
+                    triggerReveal();
+                } else {
+                    resetTimer = setTimeout(resetTrick, 2000);
+                }
+            }
+        });
+
+        stage.addEventListener('pointerup', () => clearTimeout(resetTimer));
+        stage.addEventListener('pointerleave', () => clearTimeout(resetTimer));
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>
