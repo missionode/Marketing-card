@@ -34,6 +34,7 @@
             overflow: hidden;
             background-color: var(--pearl-white);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--deep-indigo);
         }
 
         #stage {
@@ -64,11 +65,11 @@
             width: 600px;
             height: 600px;
             border-radius: 50%;
-            opacity: 0.3;
+            opacity: 0.25;
             mix-blend-mode: multiply;
         }
 
-        /* --- THE PARTICLE TRAP GAME --- */
+        /* --- THE PREDICTION GAME --- */
         #game-overlay {
             position: absolute;
             top: 0;
@@ -80,94 +81,133 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            padding: 20px;
             transition: opacity 0.5s ease;
         }
 
-        #particle-container {
+        #prediction-card {
+            width: 180px;
+            height: 240px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(30, 27, 75, 0.1);
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-content: center;
-            width: 90%;
-            max-width: 400px;
-            gap: 15px;
-            margin-bottom: 40px;
-            perspective: 1000px;
-        }
-
-        .particle {
-            width: 50px;
-            height: 50px;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1), inset 0 -5px 15px rgba(30, 27, 75, 0.1);
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            margin-bottom: 50px;
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
             position: relative;
-            border: 1px solid rgba(255,255,255,0.8);
+            transform-style: preserve-3d;
         }
 
-        .particle::after {
-            content: '';
+        #prediction-card.revealing {
+            transform: rotateY(180deg) scale(1.1);
+            box-shadow: 0 40px 80px rgba(30, 27, 75, 0.2);
+        }
+
+        .card-face {
             position: absolute;
-            width: 60%;
-            height: 60%;
-            background: radial-gradient(circle, var(--cyan), transparent);
-            border-radius: 50%;
-            opacity: 0.4;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 24px;
         }
 
-        .particle.selected {
-            transform: scale(1.2);
-            box-shadow: 0 0 30px var(--cyan);
-            border-color: var(--cyan);
-        }
-
-        .particle.removed {
-            transform: scale(0) rotate(180deg);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .game-controls {
+        .card-back {
+            background: linear-gradient(135deg, var(--violet), var(--cyan));
+            color: white;
+            padding: 20px;
             text-align: center;
-            background: rgba(255,255,255,0.4);
-            backdrop-filter: blur(15px);
-            padding: 20px 40px;
-            border-radius: 30px;
-            border: 1px solid rgba(30, 27, 75, 0.1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
         }
 
-        .status-text {
-            font-size: 14px;
+        .card-back .icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .card-back .text {
+            font-size: 12px;
             font-weight: 800;
-            color: var(--deep-indigo);
             text-transform: uppercase;
             letter-spacing: 2px;
+            opacity: 0.8;
+        }
+
+        .card-front {
+            background: white;
+            transform: rotateY(180deg);
+            padding: 20px;
+        }
+
+        .card-front .icon {
+            font-size: 80px;
             margin-bottom: 15px;
         }
 
-        .take-btn {
-            background: var(--deep-indigo);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 50px;
+        .card-front .text {
             font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s ease, opacity 0.3s ease;
-            opacity: 0.5;
-            pointer-events: none;
+            font-weight: 900;
+            color: var(--violet);
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .take-btn.active {
-            opacity: 1;
-            pointer-events: auto;
+        #options-container {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            max-width: 340px;
+        }
+
+        .option-btn {
+            flex: 1;
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .option-btn:active {
+            transform: scale(0.92);
+            background: white;
+        }
+
+        .option-btn .icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .option-btn .label {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.6;
+        }
+
+        .game-status {
+            margin-top: 40px;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.5;
+            text-align: center;
         }
 
         /* --- PRESTIGE --- */
@@ -249,8 +289,8 @@
     </svg>
 
     <div id="start-screen">
-        <h2 style="font-size: 36px; font-weight: 900; letter-spacing: -1px; margin-bottom: 12px;">The Particle Trap</h2>
-        <p style="opacity: 0.6; font-size: 16px; line-height: 1.5;">Take 1, 2, or 3 particles.<br>The player forced to take the <b>last</b> particle loses.</p>
+        <h2 style="font-size: 36px; font-weight: 900; letter-spacing: -1px; margin-bottom: 12px;">The Prediction</h2>
+        <p style="opacity: 0.6; font-size: 16px; line-height: 1.5; max-width: 280px;">The AI has already made its move.<br>Can you beat the machine?</p>
         <button id="start-btn">Start Game</button>
     </div>
 
@@ -263,13 +303,33 @@
         </div>
 
         <div id="game-overlay">
-            <div id="particle-container">
-                <!-- 15 Particles -->
+            <div id="prediction-card">
+                <div class="card-face card-back">
+                    <div class="icon">✨</div>
+                    <div class="text">AI Prediction</div>
+                </div>
+                <div class="card-face card-front">
+                    <div id="prediction-icon" class="icon">💎</div>
+                    <div id="prediction-text" class="text">Rock</div>
+                </div>
             </div>
-            <div class="game-controls">
-                <div id="status" class="status-text">AI is thinking...</div>
-                <button id="take-btn" class="take-btn">Take Selected</button>
+
+            <div id="options-container">
+                <div class="option-btn" data-move="rock">
+                    <div class="icon">💎</div>
+                    <div class="label">Rock</div>
+                </div>
+                <div class="option-btn" data-move="paper">
+                    <div class="icon">📄</div>
+                    <div class="label">Paper</div>
+                </div>
+                <div class="option-btn" data-move="scissors">
+                    <div class="icon">✂️</div>
+                    <div class="label">Scissors</div>
+                </div>
             </div>
+
+            <div id="game-status" class="game-status">Choose Your Move</div>
         </div>
         
         <div id="prestige">
@@ -287,24 +347,31 @@
         const startBtn = document.getElementById('start-btn');
         const startScreen = document.getElementById('start-screen');
         const gameOverlay = document.getElementById('game-overlay');
-        const particleContainer = document.getElementById('particle-container');
-        const statusText = document.getElementById('status');
-        const takeBtn = document.getElementById('take-btn');
+        const predictionCard = document.getElementById('prediction-card');
+        const predictionIcon = document.getElementById('prediction-icon');
+        const predictionText = document.getElementById('prediction-text');
+        const gameStatus = document.getElementById('game-status');
+        const optionBtns = document.querySelectorAll('.option-btn');
         const backgroundBlobs = document.querySelectorAll('.background-blob');
 
         let audioCtx;
         let isRevealed = false;
-        let particles = [];
-        let selectedCount = 0;
-        let totalParticles = 15;
-        let currentPlayer = 'O'; // AI starts
+        let gameActive = true;
+
+        const moves = {
+            rock: { icon: '💎', win: 'paper' },
+            paper: { icon: '📄', win: 'scissors' },
+            scissors: { icon: '✂️', win: 'rock' }
+        };
 
         // --- BACKGROUND PHYSICS ---
         const points = Array.from(backgroundBlobs).map((blob, i) => {
-            const colors = [getComputedStyle(document.documentElement).getPropertyValue('--violet'), 
-                          getComputedStyle(document.documentElement).getPropertyValue('--lavender'),
-                          getComputedStyle(document.documentElement).getPropertyValue('--magenta'),
-                          getComputedStyle(document.documentElement).getPropertyValue('--cyan')];
+            const colors = [
+                getComputedStyle(document.documentElement).getPropertyValue('--violet'), 
+                getComputedStyle(document.documentElement).getPropertyValue('--lavender'),
+                getComputedStyle(document.documentElement).getPropertyValue('--magenta'),
+                getComputedStyle(document.documentElement).getPropertyValue('--cyan')
+            ];
             blob.style.background = `radial-gradient(circle, ${colors[i]}, transparent 70%)`;
             return {
                 x: Math.random() * 100,
@@ -346,32 +413,6 @@
             osc.start(); osc.stop(audioCtx.currentTime + duration);
         }
 
-        function createParticles() {
-            for (let i = 0; i < totalParticles; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.dataset.index = i;
-                p.addEventListener('click', () => handleParticleClick(p));
-                particleContainer.appendChild(p);
-                particles.push(p);
-            }
-        }
-
-        function handleParticleClick(p) {
-            if (currentPlayer !== 'X' || p.classList.contains('removed')) return;
-
-            if (p.classList.contains('selected')) {
-                p.classList.remove('selected');
-                selectedCount--;
-            } else if (selectedCount < 3) {
-                p.classList.add('selected');
-                selectedCount++;
-                playSound(800, 0.05);
-            }
-
-            takeBtn.className = selectedCount > 0 ? 'take-btn active' : 'take-btn';
-        }
-
         function triggerReveal() {
             if (isRevealed) return;
             isRevealed = true;
@@ -387,63 +428,52 @@
             }, 50);
         }
 
-        function removeSelected() {
-            const selected = document.querySelectorAll('.particle.selected');
-            selected.forEach(p => {
-                p.classList.remove('selected');
-                p.classList.add('removed');
+        function handleMove(playerMove) {
+            if (!gameActive) return;
+            gameActive = false;
+
+            // The Rigged Logic: AI always picks the move that beats the player
+            const aiMove = moves[playerMove].win;
+            const winningInfo = moves[aiMove];
+
+            // Set the prediction card
+            predictionIcon.innerText = winningInfo.icon;
+            predictionText.innerText = aiMove;
+
+            playSound(440, 0.2);
+            gameStatus.innerText = "Revealing Prediction...";
+
+            // Start the flip animation
+            setTimeout(() => {
+                predictionCard.classList.add('revealing');
+                playSound(880, 0.4, 'triangle');
+                
+                setTimeout(() => {
+                    gameStatus.innerText = "AI Dominance Confirmed.";
+                    setTimeout(triggerReveal, 1200);
+                }, 800);
+            }, 500);
+        }
+
+        optionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const move = btn.dataset.move;
+                handleMove(move);
+                
+                // Dim other buttons
+                optionBtns.forEach(b => {
+                    if (b !== btn) b.style.opacity = '0.3';
+                    b.style.pointerEvents = 'none';
+                });
             });
-            totalParticles -= selected.length;
-            selectedCount = 0;
-            takeBtn.className = 'take-btn';
-            playSound(400, 0.2, 'square');
-
-            if (totalParticles <= 1) {
-                statusText.innerText = currentPlayer === 'X' ? "AI Analysis Complete." : "Human Pattern Detected.";
-                setTimeout(triggerReveal, 1000);
-            } else {
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-                if (currentPlayer === 'O') {
-                    statusText.innerText = "AI Processing...";
-                    setTimeout(aiMove, 1000);
-                } else {
-                    statusText.innerText = "Your Turn (Take 1-3)";
-                }
-            }
-        }
-
-        function aiMove() {
-            // Unbeatable Nim Strategy (Misere play)
-            // Goal: Leave (4n + 1) particles for the player.
-            // Current total: totalParticles
-            let target = 0;
-            if (totalParticles > 13) target = 13;
-            else if (totalParticles > 9) target = 9;
-            else if (totalParticles > 5) target = 5;
-            else target = 1;
-
-            let numToTake = totalParticles - target;
-            if (numToTake < 1) numToTake = 1;
-            if (numToTake > 3) numToTake = 3;
-
-            const available = particles.filter(p => !p.classList.contains('removed'));
-            for (let i = 0; i < numToTake; i++) {
-                available[i].classList.add('selected');
-            }
-
-            setTimeout(removeSelected, 800);
-        }
-
-        takeBtn.addEventListener('click', removeSelected);
+        });
 
         startBtn.addEventListener('click', async () => {
             await initAudio();
-            createParticles();
             animateBackground();
             startScreen.style.opacity = '0';
             setTimeout(() => {
                 startScreen.style.display = 'none';
-                aiMove(); // AI starts
             }, 500);
         });
 
