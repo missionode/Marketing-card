@@ -16,17 +16,14 @@
             --mist-grey: #E9ECEF;
             --soft-silver: #DEE2E6;
             
-            /* Accent Gradients (Iridescent) */
-            --violet: #8B5CF6;
-            --lavender: #C4B5FD;
-            --magenta: #D946EF;
-            --cyan: #22D3EE;
+            /* Accent Gradients (More Saturated for visibility) */
+            --violet: #7C3AED;
+            --lavender: #A78BFA;
+            --magenta: #DB2777;
+            --cyan: #0891B2;
             
             /* Typography */
             --deep-indigo: #1E1B4B;
-            
-            --safe-area-inset-top: env(safe-area-inset-top);
-            --safe-area-inset-bottom: env(safe-area-inset-bottom);
         }
 
         * {
@@ -42,7 +39,6 @@
             overflow: hidden;
             background-color: var(--pearl-white);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: var(--deep-indigo);
         }
 
         #stage {
@@ -52,74 +48,63 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
+            overflow: hidden;
             background: radial-gradient(circle at center, var(--pearl-white) 0%, var(--mist-grey) 100%);
         }
 
-        /* --- THE PLEDGE: HOLOGRAPHIC MESH --- */
+        /* --- LIQUID GOOEY MESH --- */
         #pledge {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden;
+            filter: url('#gooey'); /* SVG Gooey Filter */
             z-index: 10;
-            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.8s ease, transform 0.2s ease;
         }
 
-        .mesh {
+        .blob {
             position: absolute;
-            width: 150%;
-            height: 150%;
-            top: -25%;
-            left: -25%;
-            background: 
-                radial-gradient(circle at var(--p1-x, 30%) var(--p1-y, 30%), var(--violet) 0%, transparent 50%),
-                radial-gradient(circle at var(--p2-x, 70%) var(--p2-y, 20%), var(--lavender) 0%, transparent 50%),
-                radial-gradient(circle at var(--p3-x, 40%) var(--p3-y, 80%), var(--magenta) 0%, transparent 50%),
-                radial-gradient(circle at var(--p4-x, 80%) var(--p4-y, 70%), var(--cyan) 0%, transparent 50%);
-            filter: blur(80px);
-            opacity: 0.35; /* Reverted to subtle light feel */
-            transition: opacity 0.6s ease;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            opacity: 0.6;
+            filter: blur(40px);
+            mix-blend-mode: multiply;
         }
 
-        /* Removed programmed holographic-move animation */
+        #blob-1 { background: var(--violet); top: 20%; left: 20%; }
+        #blob-2 { background: var(--lavender); top: 60%; left: 70%; }
+        #blob-3 { background: var(--magenta); top: 70%; left: 10%; }
+        #blob-4 { background: var(--cyan); top: 10%; left: 80%; }
 
-        .iridescence-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 50%, rgba(255,255,255,0.4) 100%);
-            pointer-events: none;
-            z-index: 11;
+        /* Visual Feedback Pulse */
+        .pulse {
+            transform: scale(1.05);
+            transition: transform 0.1s ease-out;
         }
 
-        /* --- THE PRESTIGE: THE CARD --- */
+        /* --- PRESTIGE --- */
         #prestige {
             position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
             z-index: 5;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: var(--pearl-white);
             opacity: 0;
-            transform: scale(0.9) translateY(20px);
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+            transform: scale(0.9) translateY(30px);
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease;
         }
 
         #prestige img {
-            max-width: 90%;
-            max-height: 85%;
+            max-width: 85%;
+            max-height: 80%;
             object-fit: contain;
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(30, 27, 75, 0.15); /* Deep Indigo shadow */
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(30, 27, 75, 0.2);
         }
 
         #prestige.active {
@@ -127,94 +112,69 @@
             transform: scale(1) translateY(0);
         }
 
-        /* --- THE TURN: FLASH EFFECT --- */
         #flash {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: white;
             z-index: 100;
             opacity: 0;
             pointer-events: none;
         }
 
-        .flash-anim {
-            animation: flash-pulse 0.3s ease-out forwards;
-        }
+        .flash-anim { animation: flash-pulse 0.4s ease-out forwards; }
+        @keyframes flash-pulse { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }
 
-        @keyframes flash-pulse {
-            0% { opacity: 0; }
-            30% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-
-        /* Fullscreen Prompt */
         #start-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: 200;
             background: var(--pearl-white);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
             color: var(--deep-indigo);
             text-align: center;
-            padding: 20px;
-        }
-
-        #start-screen h2 {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 12px;
-            letter-spacing: -0.5px;
-        }
-
-        #start-screen p {
-            opacity: 0.7;
-            font-size: 16px;
-            margin-bottom: 32px;
+            transition: opacity 0.5s ease;
         }
 
         button {
             background: var(--deep-indigo);
-            color: white;
-            border: none;
-            padding: 18px 40px;
-            border-radius: 100px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 10px 25px rgba(30, 27, 75, 0.2);
-        }
-
-        button:active {
-            transform: scale(0.96);
+            color: white; border: none;
+            padding: 20px 50px; border-radius: 100px;
+            font-size: 18px; font-weight: 700;
+            cursor: pointer; margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(30, 27, 75, 0.2);
         }
     </style>
 </head>
 <body>
 
+    <!-- SVG Gooey Filter -->
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display:none">
+        <defs>
+            <filter id="gooey">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 25 -10" result="goo" />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+            </filter>
+        </defs>
+    </svg>
+
     <div id="start-screen">
-        <h2>The Magical Reveal</h2>
-        <p>Prepare for the transition.<br>Tap to start the experience.</p>
-        <button id="start-btn">Start Experience</button>
+        <h2 style="font-size: 32px; margin-bottom: 10px;">Magical Card</h2>
+        <p style="opacity: 0.6;">Tap to prepare the reveal.</p>
+        <button id="start-btn">Start</button>
     </div>
 
     <div id="stage">
         <div id="pledge">
-            <div class="mesh"></div>
-            <div class="iridescence-overlay"></div>
+            <div id="blob-1" class="blob"></div>
+            <div id="blob-2" class="blob"></div>
+            <div id="blob-3" class="blob"></div>
+            <div id="blob-4" class="blob"></div>
         </div>
         
         <div id="prestige">
-            <img src="Marketing card.png" alt="Marketing Card">
+            <img src="Marketing card.png" alt="Card">
         </div>
 
         <div id="flash"></div>
@@ -227,186 +187,118 @@
         const flash = document.getElementById('flash');
         const startBtn = document.getElementById('start-btn');
         const startScreen = document.getElementById('start-screen');
+        const blobs = document.querySelectorAll('.blob');
 
-        let audioCtx;
-        let analyser;
-        let microphone;
+        let audioCtx, analyser, microphone;
         let isRevealed = false;
 
-        // --- OPTIMIZED SNAP DETECTION ---
-        // Snaps are high-frequency bursts (clicky).
-        // We look for a spike in the 5kHz - 10kHz range.
-        const FREQ_THRESHOLD = 50; // Sensitivity for high-freq spike
-        const VOL_THRESHOLD = 0.15; // Minimum total volume
-        const COOLDOWN = 1200; 
+        // --- SENSITIVE DETECTION CONFIG ---
+        const VOL_THRESHOLD = 0.08; // Much more sensitive
+        const FREQ_THRESHOLD = 40;  // More sensitive high-end
+        const COOLDOWN = 1500;
         let lastDetectionTime = 0;
 
-        // --- FLUID NOISE ENGINE ---
-        // Moves the gradient centers non-deterministically
-        const points = [
-            { x: 30, y: 30, vx: 0.05, vy: 0.05 },
-            { x: 70, y: 20, vx: -0.04, vy: 0.06 },
-            { x: 40, y: 80, vx: 0.07, vy: -0.03 },
-            { x: 80, y: 70, vx: -0.06, vy: -0.05 }
-        ];
+        // --- LIQUID BLOBS PHYSICS ---
+        const points = Array.from(blobs).map(() => ({
+            x: Math.random() * 100,
+            y: Math.random() * 100,
+            vx: (Math.random() - 0.5) * 0.2,
+            vy: (Math.random() - 0.5) * 0.2
+        }));
 
-        function animateMesh() {
+        function animateBlobs() {
             if (isRevealed) return;
-
             points.forEach((p, i) => {
-                p.x += p.vx;
-                p.y += p.vy;
-
-                // Bounce with a bit of randomness to avoid patterns
-                if (p.x < 0 || p.x > 100) {
-                    p.vx *= -1;
-                    p.vx += (Math.random() - 0.5) * 0.01;
-                }
-                if (p.y < 0 || p.y > 100) {
-                    p.vy *= -1;
-                    p.vy += (Math.random() - 0.5) * 0.01;
-                }
-
-                document.documentElement.style.setProperty(`--p${i+1}-x`, `${p.x}%`);
-                document.documentElement.style.setProperty(`--p${i+1}-y`, `${p.y}%`);
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0 || p.x > 100) p.vx *= -1;
+                if (p.y < 0 || p.y > 100) p.vy *= -1;
+                blobs[i].style.left = p.x + '%';
+                blobs[i].style.top = p.y + '%';
             });
-
-            requestAnimationFrame(animateMesh);
+            requestAnimationFrame(animateBlobs);
         }
 
         async function initAudio() {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: {
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        autoGainControl: false
-                    } 
-                });
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 microphone = audioCtx.createMediaStreamSource(stream);
                 analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 1024; // Better frequency resolution
+                analyser.fftSize = 512;
                 microphone.connect(analyser);
-                
-                detectSnap();
-            } catch (err) {
-                console.error("Mic access denied.", err);
-            }
+                processAudio();
+            } catch (err) { console.error("Mic denied", err); }
         }
 
-        function detectSnap() {
+        function processAudio() {
             if (isRevealed) return;
-
             const freqData = new Uint8Array(analyser.frequencyBinCount);
             const timeData = new Float32Array(analyser.fftSize);
-            
             analyser.getByteFrequencyData(freqData);
             analyser.getFloatTimeDomainData(timeData);
 
-            // 1. Check Volume (Peak Amplitude)
             let peak = 0;
             for (let i = 0; i < timeData.length; i++) {
                 const abs = Math.abs(timeData[i]);
                 if (abs > peak) peak = abs;
             }
 
-            // 2. Check High Frequencies (The "Click")
-            // Bin index for ~5kHz-8kHz
-            let highFreqSum = 0;
-            const startBin = Math.floor(5000 / (audioCtx.sampleRate / analyser.fftSize));
-            const endBin = Math.floor(8000 / (audioCtx.sampleRate / analyser.fftSize));
-            
-            for (let i = startBin; i <= endBin; i++) {
-                highFreqSum += freqData[i];
+            // Visual Heartbeat (mesh pulses when it hears anything)
+            if (peak > 0.02) {
+                pledge.style.transform = `scale(${1 + peak * 0.2})`;
+            } else {
+                pledge.style.transform = `scale(1)`;
             }
-            const highFreqAvg = highFreqSum / (endBin - startBin + 1);
+
+            // High freq detection (~5-10kHz)
+            let highFreqSum = 0;
+            for (let i = 100; i < 200; i++) highFreqSum += freqData[i];
+            const highFreqAvg = highFreqSum / 100;
 
             const now = Date.now();
-            // A snap is high peak + high frequency spike
             if (peak > VOL_THRESHOLD && highFreqAvg > FREQ_THRESHOLD && (now - lastDetectionTime) > COOLDOWN) {
                 lastDetectionTime = now;
                 triggerReveal();
             }
-
-            requestAnimationFrame(detectSnap);
-        }
-
-        function playSnap() {
-            if (!audioCtx) return;
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            
-            // Clean high-impact digital click
-            const click = audioCtx.createOscillator();
-            const clickGain = audioCtx.createGain();
-            click.type = 'sine';
-            click.frequency.setValueAtTime(1200, audioCtx.currentTime);
-            click.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
-            clickGain.gain.setValueAtTime(0.8, audioCtx.currentTime);
-            clickGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            click.connect(clickGain);
-            clickGain.connect(audioCtx.destination);
-            click.start();
-            click.stop(audioCtx.currentTime + 0.1);
+            requestAnimationFrame(processAudio);
         }
 
         function triggerReveal() {
             if (isRevealed) return;
             isRevealed = true;
 
-            playSnap();
+            // Snap sound
+            const click = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            click.frequency.setValueAtTime(1500, audioCtx.currentTime);
+            click.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+            g.gain.setValueAtTime(1, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            click.connect(g); g.connect(audioCtx.destination);
+            click.start(); click.stop(audioCtx.currentTime + 0.15);
+
             flash.classList.add('flash-anim');
-            
             setTimeout(() => {
                 pledge.style.opacity = '0';
                 prestige.classList.add('active');
             }, 50);
-
-            setTimeout(() => {
-                flash.classList.remove('flash-anim');
-            }, 350);
         }
 
         startBtn.addEventListener('click', async () => {
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            } else if (document.documentElement.webkitRequestFullscreen) {
-                document.documentElement.webkitRequestFullscreen();
-            }
-
+            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
             await initAudio();
-            animateMesh(); // Start the fluid motion
+            animateBlobs();
             startScreen.style.opacity = '0';
-            setTimeout(() => startScreen.style.display = 'none', 300);
+            setTimeout(() => startScreen.style.display = 'none', 500);
         });
 
+        // Reset
         let resetTimer;
-
-        function resetTrick() {
-            isRevealed = false;
-            pledge.style.opacity = '1';
-            prestige.classList.remove('active');
-            if (analyser) detectSnap();
-            animateMesh(); // Resume fluid motion
-        }
-
-        stage.addEventListener('pointerdown', (e) => {
-            if (startScreen.style.display === 'none') {
-                if (!isRevealed) {
-                    triggerReveal();
-                } else {
-                    resetTimer = setTimeout(resetTrick, 2000);
-                }
-            }
+        stage.addEventListener('pointerdown', () => {
+            if (!isRevealed) triggerReveal();
+            else resetTimer = setTimeout(() => location.reload(), 2000);
         });
-
         stage.addEventListener('pointerup', () => clearTimeout(resetTimer));
-        stage.addEventListener('pointerleave', () => clearTimeout(resetTimer));
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
     </script>
 </body>
 </html>
