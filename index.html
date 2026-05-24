@@ -73,8 +73,8 @@
                     
                     <div class="coin-container mx-auto my-8">
                         <div id="coin-inner" class="coin-inner w-full h-full relative">
-                            <div class="coin-face absolute inset-0 rounded-full flex items-center justify-center text-white text-2xl font-semibold shadow-lg ring-4 ring-accent-indigo/20">YOU</div>
-                            <div class="coin-face coin-back absolute inset-0 rounded-full flex items-center justify-center text-white text-2xl font-semibold shadow-lg ring-4 ring-accent-emerald/20">AI</div>
+                            <div class="coin-face absolute inset-0 rounded-full flex items-center justify-center text-white text-lg font-thin tracking-widest shadow-lg ring-4 ring-accent-indigo/20">YOU</div>
+                            <div class="coin-face coin-back absolute inset-0 rounded-full flex items-center justify-center text-white text-lg font-thin tracking-widest shadow-lg ring-4 ring-accent-emerald/20">AI</div>
                         </div>
                     </div>
                     <h2 id="toss-status" class="text-xl font-medium tracking-tight text-slate-800 h-8">Click below to start</h2>
@@ -357,7 +357,9 @@
 
         function showOutcome(result) {
             switchView('outcome');
-            const data = result === 'draw' ? config.outcomeScreens.draw : config.outcomeScreens.victory;
+            const isDraw = result === 'draw';
+            const data = isDraw ? config.outcomeScreens.draw : config.outcomeScreens.victory;
+            
             DOM.outcomeHeadline.innerText = data.headline;
             DOM.outcomeSubline.innerText = data.subline;
             DOM.outcomeIcon.innerText = data.icon;
@@ -367,9 +369,27 @@
                 DOM.outcomeImage.src = data.image;
                 DOM.outcomeImageContainer.classList.remove('hidden');
                 DOM.outcomeIcon.classList.add('hidden');
+                
+                if (isDraw) {
+                    // Hide everything else for Stalemate
+                    DOM.outcomeHeadline.classList.add('hidden');
+                    DOM.outcomeSubline.classList.add('hidden');
+                    DOM.resetBtn.classList.add('hidden');
+                    DOM.outcomeImage.style.cursor = 'pointer';
+                    DOM.outcomeImage.onclick = initGame;
+                } else {
+                    DOM.outcomeHeadline.classList.remove('hidden');
+                    DOM.outcomeSubline.classList.remove('hidden');
+                    DOM.resetBtn.classList.remove('hidden');
+                    DOM.outcomeImage.style.cursor = 'default';
+                    DOM.outcomeImage.onclick = null;
+                }
             } else {
                 DOM.outcomeImageContainer.classList.add('hidden');
                 DOM.outcomeIcon.classList.remove('hidden');
+                DOM.outcomeHeadline.classList.remove('hidden');
+                DOM.outcomeSubline.classList.remove('hidden');
+                DOM.resetBtn.classList.remove('hidden');
             }
         }
 
