@@ -61,7 +61,9 @@
 
         /* Glassmorphism Effect */
         .glass-container {
-            background: rgba(255, 255, 255, 0.4);
+            background: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url('background-image.jpg');
+            background-size: cover;
+            background-position: center;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.4);
@@ -221,8 +223,8 @@
             },
             "outcomeScreens": {
                 "victory": {
-                    "headline": "Automated Efficiency Achieved",
-                    "subline": "The AI identified your trajectory instantly. In a world of total automation, pure logic belongs to the machines. Your next move must be human.",
+                    "headline": "Calculated Perfection",
+                    "subline": "The machine predicted your every move before you even made it. Don't let a series of algorithms outsmart you. You're better than that.",
                     "buttonText": "Re-engage Matrix",
                     "icon": "🤖"
                 },
@@ -314,9 +316,18 @@
             Object.keys(DOM.views).forEach(v => DOM.views[v].classList.add('hidden'));
             DOM.views[viewName].classList.remove('hidden');
             
-            // Default header visibility: show on Toss and Gameplay
-            if (viewName === 'toss' || viewName === 'gameplay') {
+            // Header image management
+            if (viewName === 'outcome') {
+                DOM.headerContainer.classList.add('hidden');
+            } else {
                 DOM.headerContainer.classList.remove('hidden');
+                // Set appropriate header based on view
+                const headerImg = document.getElementById('header-image');
+                if (viewName === 'toss') {
+                    headerImg.src = 'Are You Ready.png';
+                } else if (viewName === 'gameplay') {
+                    headerImg.src = 'gamepageheader.png';
+                }
             }
 
             // Show footer image only on Toss view
@@ -444,10 +455,12 @@
             const data = isDraw ? config.outcomeScreens.draw : config.outcomeScreens.victory;
             
             // Header image management for outcomes
+            const headerImg = document.getElementById('header-image');
             if (isDraw) {
                 DOM.headerContainer.classList.add('hidden');
             } else {
                 DOM.headerContainer.classList.remove('hidden');
+                headerImg.src = 'outcome.png';
             }
             
             DOM.outcomeHeadline.innerText = data.headline;

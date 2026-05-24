@@ -12,6 +12,9 @@ const ASSETS = [
   '/Stalemate.png',
   '/Are You Ready.png',
   '/footerlanding.png',
+  '/gamepageheader.png',
+  '/outcome.png',
+  '/background-image.jpg',
   '/coin_bg.gif',
   'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4'
 ];
