@@ -314,9 +314,18 @@
             Object.keys(DOM.views).forEach(v => DOM.views[v].classList.add('hidden'));
             DOM.views[viewName].classList.remove('hidden');
             
-            // Default header visibility: show on Toss and Gameplay
-            if (viewName === 'toss' || viewName === 'gameplay') {
+            // Header image management
+            if (viewName === 'outcome') {
+                DOM.headerContainer.classList.add('hidden');
+            } else {
                 DOM.headerContainer.classList.remove('hidden');
+                // Set appropriate header based on view
+                const headerImg = document.getElementById('header-image');
+                if (viewName === 'toss') {
+                    headerImg.src = 'Are You Ready.png';
+                } else if (viewName === 'gameplay') {
+                    headerImg.src = 'gamepageheader.png';
+                }
             }
 
             // Show footer image only on Toss view
