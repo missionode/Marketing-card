@@ -108,14 +108,14 @@
 
         .coin-face {
             backface-visibility: hidden;
-            background-image: linear-gradient(rgba(79, 70, 229, 0.85), rgba(79, 70, 229, 0.85)), url('coin_bg.gif');
+            background-image: linear-gradient(rgba(79, 70, 229, 0.6), rgba(79, 70, 229, 0.6)), url('coin_bg.gif');
             background-size: cover;
             background-position: center;
         }
 
         .coin-back {
             transform: rotateY(180deg);
-            background-image: linear-gradient(rgba(5, 150, 105, 0.85), rgba(5, 150, 105, 0.85)), url('coin_bg.gif');
+            background-image: linear-gradient(rgba(5, 150, 105, 0.6), rgba(5, 150, 105, 0.6)), url('coin_bg.gif');
         }
 
         /* Responsive Coin Size */
@@ -125,7 +125,7 @@
         }
     </style>
 </head>
-<body class="font-sans font-light text-slate-800 min-h-screen flex items-center justify-center p-4">
+<body class="font-sans font-light text-slate-800 min-h-screen flex items-center justify-center p-2">
 
     <!-- Mesh Background -->
     <div class="mesh-bg">
@@ -143,14 +143,14 @@
         </div>
 
         <!-- Content Area with Padding -->
-        <div class="p-8 flex-grow">
+        <div class="p-6 flex-grow">
             <!-- View 1: The Toss -->
-            <div id="view-toss" class="hidden space-y-6">
-                <div class="text-center space-y-6">
+            <div id="view-toss" class="hidden space-y-4">
+                <div class="text-center space-y-4">
                     <h1 class="text-3xl font-semibold tracking-tight leading-tight bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">Are you future ready?</h1>
                     <p class="text-slate-500 text-base px-2 font-light leading-relaxed">Are you safe in the AI-driven world? Let's check if you are future ready to survive the AI.</p>
                     
-                    <div class="coin-container mx-auto my-8">
+                    <div class="coin-container mx-auto my-4">
                         <div id="coin-inner" class="coin-inner w-full h-full relative">
                             <div class="coin-face absolute inset-0 rounded-full flex items-center justify-center text-white text-lg font-thin tracking-widest shadow-lg ring-1 ring-white/30 drop-shadow-sm">YOU</div>
                             <div class="coin-face coin-back absolute inset-0 rounded-full flex items-center justify-center text-white text-lg font-thin tracking-widest shadow-lg ring-1 ring-white/30 drop-shadow-sm">AI</div>
@@ -158,14 +158,14 @@
                     </div>
                     <h2 id="toss-status" class="text-sm font-light tracking-tight text-indigo-400/80 h-8">Click below to start</h2>
                     
-                    <button id="start-toss-btn" class="mt-4 px-8 py-4 glass-button text-indigo-700 font-semibold rounded-2xl w-full shadow-sm">
+                    <button id="start-toss-btn" class="mt-2 px-8 py-4 glass-button text-indigo-700 font-semibold rounded-2xl w-full shadow-sm">
                         Start Digital Toss
                     </button>
                 </div>
             </div>
 
             <!-- View 2: Gameplay -->
-            <div id="view-gameplay" class="hidden space-y-8">
+            <div id="view-gameplay" class="hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <h1 id="app-title" class="text-xl font-semibold tracking-tighter uppercase bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">FUTURE READY?</h1>
                     <div id="game-status" class="text-xs font-semibold tracking-wider uppercase px-3 py-1 bg-indigo-50/50 border border-indigo-100/50 rounded-full text-indigo-600">
@@ -183,14 +183,14 @@
             </div>
 
             <!-- View 3: Outcome Screens -->
-            <div id="view-outcome" class="hidden text-center py-4 space-y-6">
-                <div id="outcome-image-container" class="hidden mb-4 rounded-2xl overflow-hidden shadow-lg border border-white/40">
+            <div id="view-outcome" class="hidden text-center py-2 space-y-4">
+                <div id="outcome-image-container" class="hidden mb-2 rounded-2xl overflow-hidden shadow-lg border border-white/40">
                     <img id="outcome-image" src="" alt="Outcome" class="w-full h-auto">
                 </div>
-                <div id="outcome-icon" class="text-6xl mb-4"></div>
+                <div id="outcome-icon" class="text-6xl mb-2"></div>
                 <h2 id="outcome-headline" class="text-3xl font-semibold tracking-tight leading-tight bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent"></h2>
                 <p id="outcome-subline" class="text-slate-500 text-lg leading-relaxed px-4 font-light"></p>
-                <button id="reset-btn" class="mt-8 px-8 py-4 glass-button text-indigo-700 font-semibold rounded-2xl w-full shadow-sm cursor-pointer">
+                <button id="reset-btn" class="mt-4 px-8 py-4 glass-button text-indigo-700 font-semibold rounded-2xl w-full shadow-sm cursor-pointer">
                     Re-engage Matrix
                 </button>
             </div>
