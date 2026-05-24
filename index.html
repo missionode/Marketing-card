@@ -87,13 +87,13 @@
             background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(244, 114, 182, 0.3);
             box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.03);
         }
 
         .glass-grid-cell:hover {
             background: rgba(255, 255, 255, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(244, 114, 182, 0.5);
         }
 
         .coin-container {
@@ -155,7 +155,8 @@
             <!-- View 1: The Toss -->
             <div id="view-toss" class="hidden space-y-4">
                 <div class="text-center space-y-4">
-                    <h1 class="text-3xl font-semibold tracking-tight leading-tight bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">AI vs YOU: Are You Ready?</h1>
+                    <h1 class="text-3xl font-bold tracking-tight leading-tight bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">AI vs YOU: Are You Ready?</h1>
+                    <h2 class="text-lg font-semibold text-slate-700">Let's check if my job is in danger</h2>
                     <p class="text-slate-500 text-base px-2 font-light leading-relaxed">The AI is getting smarter every day. Test your skills against the perfect machine and see if you have what it takes to stay ahead.</p>
                     
                     <div class="coin-container mx-auto my-4">
@@ -175,7 +176,7 @@
             <!-- View 2: Gameplay -->
             <div id="view-gameplay" class="hidden space-y-6">
                 <div class="flex justify-between items-center">
-                    <h1 id="app-title" class="text-xl font-semibold tracking-tighter uppercase bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">FUTURE READY?</h1>
+                    <h1 id="app-title" class="text-xl font-semibold tracking-tighter uppercase bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">TIC TAC TOE</h1>
                     <div id="game-status" class="text-xs font-semibold tracking-wider uppercase px-3 py-1 bg-indigo-50/50 border border-indigo-100/50 rounded-full text-indigo-600">
                         Your Turn
                     </div>
@@ -183,6 +184,14 @@
 
                 <div id="grid" class="grid grid-cols-3 gap-3">
                     <!-- Grid items injected here -->
+                </div>
+
+                <div class="text-center space-y-2 p-4 glass-grid-cell rounded-2xl border border-white/20">
+                    <h3 class="text-indigo-900 font-semibold text-sm">How to Play</h3>
+                    <p class="text-slate-500 text-xs font-light leading-relaxed">
+                        Match three <b>X</b> (Human) or <b>O</b> (AI) tokens in a row, column, or diagonal to win.<br>
+                        Example: <b>X X X</b> — stay focused against the perfect machine.
+                    </p>
                 </div>
                 
                 <div id="local-overlay" class="hidden absolute inset-0 bg-white/40 backdrop-blur-md flex items-center justify-center rounded-3xl z-10">
@@ -214,7 +223,7 @@
         const config = {
             "branding": {
                 "title": "AI vs YOU: Are You Ready?",
-                "tagline": "The AI is getting smarter every day. Test your skills against the perfect machine and see if you have what it takes to stay ahead."
+                "tagline": "Let's check if my job is in danger. The AI is getting smarter every day. Test your skills against the perfect machine and see if you have what it takes to stay ahead."
             },
             "tossScreen": {
                 "searchingText": "Flipping Coin...",
@@ -223,8 +232,8 @@
             },
             "outcomeScreens": {
                 "victory": {
-                    "headline": "Calculated Perfection",
-                    "subline": "The machine predicted your every move before you even made it. Don't let a series of algorithms outsmart you. You're better than that.",
+                    "headline": "Almost Had It",
+                    "subline": "The machine caught a mistake, but you were close. Don't give up—one minor adjustment could be all it takes to win. Let's play again.",
                     "buttonText": "Re-engage Matrix",
                     "icon": "🤖"
                 },
