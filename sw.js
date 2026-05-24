@@ -11,6 +11,7 @@ const ASSETS = [
   '/favicon.ico',
   '/Stalemate.png',
   '/Are You Ready.png',
+  '/footerlanding.png',
   '/coin_bg.gif',
   'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4'
 ];
