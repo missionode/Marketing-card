@@ -82,10 +82,16 @@
         }
 
         .glass-grid-cell {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.03);
+        }
+
+        .glass-grid-cell:hover {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.6);
         }
 
         .coin-container {
@@ -139,7 +145,7 @@
         
         <!-- Full-width Header -->
         <div id="header-image-container" class="w-full h-48 overflow-hidden shrink-0">
-            <img src="Stalemate.png" alt="AI Hero" class="w-full h-full object-cover">
+            <img id="header-image" src="Are You Ready.png" alt="AI Hero" class="w-full h-full object-cover">
         </div>
 
         <!-- Content Area with Padding -->
@@ -147,8 +153,8 @@
             <!-- View 1: The Toss -->
             <div id="view-toss" class="hidden space-y-4">
                 <div class="text-center space-y-4">
-                    <h1 class="text-3xl font-semibold tracking-tight leading-tight bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">Are you future ready?</h1>
-                    <p class="text-slate-500 text-base px-2 font-light leading-relaxed">Are you safe in the AI-driven world? Let's check if you are future ready to survive the AI.</p>
+                    <h1 class="text-3xl font-semibold tracking-tight leading-tight bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">AI vs YOU: Are You Ready?</h1>
+                    <p class="text-slate-500 text-base px-2 font-light leading-relaxed">The AI is getting smarter every day. Test your skills against the perfect machine and see if you have what it takes to stay ahead.</p>
                     
                     <div class="coin-container mx-auto my-4">
                         <div id="coin-inner" class="coin-inner w-full h-full relative">
@@ -159,7 +165,7 @@
                     <h2 id="toss-status" class="text-sm font-light tracking-tight text-indigo-400/80 h-8">Click below to start</h2>
                     
                     <button id="start-toss-btn" class="mt-2 px-8 py-4 glass-button text-indigo-700 font-semibold rounded-2xl w-full shadow-sm">
-                        Start Digital Toss
+                        Check My Readiness
                     </button>
                 </div>
             </div>
@@ -198,15 +204,15 @@
 
         <!-- Full-width Footer -->
         <div id="toss-footer" class="hidden w-full h-32 overflow-hidden shrink-0">
-            <img src="Stalemate.png" alt="AI Footer" class="w-full h-full object-cover">
+            <img src="Are You Ready.png" alt="AI Footer" class="w-full h-full object-cover">
         </div>
     </div>
 
     <script>
         const config = {
             "branding": {
-                "title": "Are you future ready?",
-                "tagline": "Are you safe in the AI-driven world? Let's check if you are future ready to survive the AI, or if you just need to switch your career."
+                "title": "AI vs YOU: Are You Ready?",
+                "tagline": "The AI is getting smarter every day. Test your skills against the perfect machine and see if you have what it takes to stay ahead."
             },
             "tossScreen": {
                 "searchingText": "Flipping Coin...",
@@ -372,12 +378,12 @@
             DOM.grid.innerHTML = '';
             STATE.board.forEach((cell, idx) => {
                 const btn = document.createElement('button');
-                btn.className = `h-24 w-full glass-grid-cell rounded-2xl text-4xl font-black flex items-center justify-center transition-all duration-300 ${!cell && STATE.gameActive ? 'hover:bg-white/20 hover:shadow-md hover:-translate-y-1 cursor-pointer' : 'cursor-default'}`;
+                btn.className = `h-24 w-full glass-grid-cell rounded-2xl text-4xl font-black flex items-center justify-center transition-all duration-300 ${!cell && STATE.gameActive ? 'cursor-pointer' : 'cursor-default'}`;
                 
                 if (cell) {
                     btn.innerText = cell;
-                    btn.classList.add(cell === STATE.aiToken ? 'text-accent-indigo' : 'text-accent-emerald');
-                    btn.classList.add('scale-110');
+                    btn.classList.add(cell === STATE.aiToken ? 'text-indigo-600' : 'text-emerald-600');
+                    btn.classList.add('scale-105');
                 }
                 
                 btn.addEventListener('click', () => handleHumanMove(idx));
