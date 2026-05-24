@@ -210,12 +210,20 @@
                 <button id="reset-btn" class="mt-4 px-8 py-4 glass-button text-indigo-700 font-semibold rounded-2xl w-full shadow-sm cursor-pointer">
                     Re-engage Matrix
                 </button>
+                <button id="lucky-btn" class="mt-2 px-8 py-4 glass-button text-pink-700 font-semibold rounded-2xl w-full shadow-sm cursor-pointer">
+                    Feeling Lucky?
+                </button>
             </div>
         </div>
 
         <!-- Full-width Footer -->
         <div id="toss-footer" class="hidden w-full h-32 overflow-hidden shrink-0">
             <img src="footerlanding.png" alt="AI Footer" class="w-full h-full object-cover">
+        </div>
+        
+        <!-- Lightbox Overlay -->
+        <div id="lightbox" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md cursor-pointer">
+            <img src="solution.png" alt="Solution" class="max-w-full max-h-full rounded-2xl shadow-2xl">
         </div>
     </div>
 
@@ -275,7 +283,9 @@
             outcomeIcon: document.getElementById('outcome-icon'),
             outcomeImage: document.getElementById('outcome-image'),
             outcomeImageContainer: document.getElementById('outcome-image-container'),
-            resetBtn: document.getElementById('reset-btn')
+            resetBtn: document.getElementById('reset-btn'),
+            luckyBtn: document.getElementById('lucky-btn'),
+            lightbox: document.getElementById('lightbox')
         };
 
         // Synthetic Audio Generator
@@ -571,6 +581,8 @@
 
         DOM.resetBtn.addEventListener('click', initGame);
         DOM.startTossBtn.addEventListener('click', startToss);
+        DOM.luckyBtn.addEventListener('click', () => DOM.lightbox.classList.remove('hidden'));
+        DOM.lightbox.addEventListener('click', () => DOM.lightbox.classList.add('hidden'));
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
