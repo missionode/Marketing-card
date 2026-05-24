@@ -2,146 +2,450 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Magic Card Reveal</title>
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfect Zero - Unbeatable Tic-Tac-Toe</title>
+    <meta name="theme-color" content="#4f46e5">
     <link rel="manifest" href="manifest.json">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <meta name="theme-color" content="#000000">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <style>
-        :root {
-            --pearl-white: #F8F9FA; --mist-grey: #E9ECEF; --soft-silver: #DEE2E6;
-            --violet: #8B5CF6; --lavender: #C4B5FD; --magenta: #D946EF; --cyan: #22D3EE;
-            --deep-indigo: #1E1B4B;
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg-base: #f8fafc; /* slate-50 */
+            --color-border-subtle: #e2e8f0; /* slate-200 */
+            --color-accent-indigo: #4f46e5; /* indigo-600 */
+            --color-accent-emerald: #059669; /* emerald-600 */
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background-color: var(--pearl-white); font-family: 'Poppins', sans-serif; color: var(--deep-indigo); }
-        #stage { width: 100%; height: 100%; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden; background: radial-gradient(circle at center, var(--pearl-white) 0%, var(--mist-grey) 100%); }
-        #pledge { position: absolute; top: 0; left: 0; width: 100%; height: 100%; filter: url('#liquid-mercury'); z-index: 1; transition: opacity 1.2s ease; }
-        .background-blob { position: absolute; width: 600px; height: 600px; border-radius: 50%; opacity: 0.4; mix-blend-mode: multiply; }
-        .glass-card { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(40px) saturate(1.8); -webkit-backdrop-filter: blur(40px) saturate(1.8); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 40px; padding: 48px 32px; box-shadow: 0 30px 60px rgba(30, 27, 75, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.3); width: 92%; max-width: 380px; z-index: 10; display: flex; flex-direction: column; align-items: center; text-align: center; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); position: relative; overflow: hidden; }
-        .glass-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 40%, rgba(255,255,255,0.2) 60%, transparent 100%); transform: rotate(-15deg); pointer-events: none; }
-        .primary-btn { background: var(--deep-indigo); color: white; border: none; padding: 20px 48px; border-radius: 100px; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; box-shadow: 0 12px 30px rgba(30, 27, 75, 0.2); transition: all 0.3s ease; margin-top: 32px; }
-        .primary-btn:active { transform: scale(0.96); }
-        #game-overlay { position: absolute; width: 100%; height: 100%; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; z-index: 10; }
-        #ttt-board { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 300px; aspect-ratio: 1; margin-bottom: 32px; }
-        .cell { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 40px; font-weight: 900; color: var(--deep-indigo); cursor: pointer; transition: all 0.25s ease; }
-        .cell.marked { background: white; color: var(--magenta); box-shadow: 0 10px 25px rgba(217, 70, 239, 0.2); transform: scale(1.05); }
-        #toss-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 250; background: transparent; display: none; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.6s ease; }
-        .coin-container { width: 140px; height: 140px; perspective: 1200px; margin-bottom: 60px; position: relative; }
-        .coin { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: rotateX(0deg) rotateY(0deg); }
-        .coin-side { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; font-weight: 900; border: 6px solid #fff; background: white; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
-        .coin-ai { background: linear-gradient(135deg, var(--violet), var(--cyan)); color: white; transform: translateZ(2px); }
-        .coin-human { transform: rotateY(180deg) translateZ(2px); color: var(--magenta); }
-        .coin-shadow { position: absolute; bottom: -30px; left: 50%; width: 100px; height: 15px; background: rgba(0,0,0,0.1); border-radius: 50%; filter: blur(8px); transform: translateX(-50%) scale(1); transition: all 0.8s ease; pointer-events: none; }
-        .toss-up { animation: coin-toss-arc 2.5s cubic-bezier(0.1, 0, 0.3, 1) forwards; }
-        @keyframes coin-toss-arc { 0% { transform: translateY(0); } 30% { transform: translateY(-300px); } 100% { transform: translateY(0); } }
-        .coin-flip { animation: coin-spin 2.5s cubic-bezier(0.1, 0, 0.3, 1) forwards; }
-        @keyframes coin-spin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(var(--final-rotation-y)); } }
-        #winner-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 500; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(50px) saturate(2); opacity: 0; transition: opacity 0.5s ease; }
-        #winner-screen h2 { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 4px; color: var(--deep-indigo); opacity: 0.6; margin-bottom: 10px; }
-        #winner-name { font-size: 42px; font-weight: 900; letter-spacing: -2px; line-height: 1; color: var(--magenta); text-shadow: 0 10px 30px rgba(217, 70, 239, 0.3); }
-        #prestige { position: absolute; width: 100%; height: 100%; z-index: 100; display: flex; justify-content: center; align-items: center; opacity: 0; transform: scale(0.9) translateY(40px); visibility: hidden; transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease; }
-        #prestige img { max-width: 95%; max-height: 90%; object-fit: contain; border-radius: 24px; box-shadow: 0 40px 100px rgba(30, 27, 75, 0.3); }
-        #prestige.active { opacity: 1; transform: scale(1) translateY(0); visibility: visible; }
-        #flash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; opacity: 0; pointer-events: none; }
-        .flash-anim { animation: flash-pulse 0.5s ease-out forwards; }
-        @keyframes flash-pulse { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }
-        #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 200; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.8s ease; }
-        .badge { background: rgba(139, 92, 246, 0.1); color: var(--violet); padding: 6px 16px; border-radius: 100px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 24px; }
-        h1 { font-size: 32px; font-weight: 900; letter-spacing: -1px; line-height: 1.1; margin-bottom: 16px; }
-        .intro-text { font-size: 15px; line-height: 1.6; opacity: 0.7; font-weight: 500; margin-bottom: 8px; }
-        .game-status { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; opacity: 0.5; margin-top: 16px; transition: all 0.3s ease; }
+        
+        .coin-container {
+            perspective: 1000px;
+        }
+        
+        .coin-inner {
+            transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        
+        .coin-flipping {
+            animation: flip 0.2s infinite linear;
+        }
+        
+        @keyframes flip {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        .coin-face {
+            backface-visibility: hidden;
+            background-image: linear-gradient(rgba(79, 70, 229, 0.85), rgba(79, 70, 229, 0.85)), url('coin_bg.gif');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .coin-back {
+            transform: rotateY(180deg);
+            background-image: linear-gradient(rgba(5, 150, 105, 0.85), rgba(5, 150, 105, 0.85)), url('coin_bg.gif');
+        }
+
+        /* Responsive Coin Size */
+        .coin-container {
+            width: clamp(6rem, 20vw, 8rem);
+            height: clamp(6rem, 20vw, 8rem);
+        }
     </style>
 </head>
-<body>
-    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
-        <defs><filter id="liquid-mercury"><feGaussianBlur in="SourceGraphic" stdDeviation="40" result="blur" /><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -15" result="goo" /><feComposite in="SourceGraphic" in2="goo" operator="atop"/></filter></defs>
-    </svg>
-    <div id="stage">
-        <div id="pledge">
-            <div id="blob-1" class="background-blob"></div><div id="blob-2" class="background-blob"></div>
-            <div id="blob-3" class="background-blob"></div><div id="blob-4" class="background-blob"></div>
+<body class="bg-bg-base font-sans font-light text-slate-900 min-h-screen flex items-center justify-center p-4">
+
+    <!-- App Container -->
+    <div id="app" class="w-full max-w-md bg-white rounded-3xl shadow-sm border border-border-subtle transition-all duration-500 overflow-hidden flex flex-col">
+        
+        <!-- Full-width Header -->
+        <div id="header-image-container" class="w-full h-48 overflow-hidden shrink-0">
+            <img src="Stalemate.png" alt="AI Hero" class="w-full h-full object-cover">
         </div>
-        <div id="start-screen"><div class="glass-card"><div class="badge">AI Intelligence Demo</div><h1>Notakto Avoidance</h1><p class="intro-text">Challenge the machine in a game of pure foresight.</p><p class="intro-text" style="font-size: 13px; font-weight: 700;">RULES: Both players use X. The first to make 3-in-a-row loses.</p><button id="start-btn" class="primary-btn">Begin Match</button></div></div>
-        <div id="toss-screen"><div class="glass-card"><h2 style="font-size: 20px; font-weight: 900; margin-bottom: 40px; letter-spacing: 1px;">DECIDING INITIATIVE</h2><div class="coin-container"><div id="coin" class="coin"><div class="coin-side coin-ai">AI</div><div class="coin-side coin-human">YOU</div></div><div id="coin-shadow" class="coin-shadow"></div></div><p id="toss-result" style="font-size: 13px; font-weight: 800; opacity: 0.5; text-transform: uppercase; letter-spacing: 2px;">Flipping...</p></div></div>
-        <div id="game-overlay"><div id="ttt-board"><div class="cell" data-index="0"></div><div class="cell" data-index="1"></div><div class="cell" data-index="2"></div><div class="cell" data-index="3"></div><div class="cell" data-index="4"></div><div class="cell" data-index="5"></div><div class="cell" data-index="6"></div><div class="cell" data-index="7"></div><div class="cell" data-index="8"></div></div><div id="game-status" class="game-status">Synchronizing...</div></div>
-        <div id="winner-screen"><h2>The Match Result</h2><div id="winner-name">AI PRECISION WINS</div></div>
-        <div id="prestige"><img src="Marketing card.png" alt="Card"></div><div id="flash"></div>
+
+        <!-- Content Area with Padding -->
+        <div class="p-8 flex-grow">
+            <!-- View 1: The Toss -->
+            <div id="view-toss" class="hidden space-y-6">
+                <div class="text-center space-y-6">
+                    <h1 class="text-3xl font-semibold tracking-tight text-slate-900 leading-tight">Are you future ready?</h1>
+                    <p class="text-slate-500 text-base px-2 font-light">Are you safe in the AI-driven world? Let's check if you are future ready to survive the AI.</p>
+                    
+                    <div class="coin-container mx-auto my-8">
+                        <div id="coin-inner" class="coin-inner w-full h-full relative">
+                            <div class="coin-face absolute inset-0 rounded-full flex items-center justify-center text-white text-2xl font-semibold shadow-lg ring-4 ring-accent-indigo/20">YOU</div>
+                            <div class="coin-face coin-back absolute inset-0 rounded-full flex items-center justify-center text-white text-2xl font-semibold shadow-lg ring-4 ring-accent-emerald/20">AI</div>
+                        </div>
+                    </div>
+                    <h2 id="toss-status" class="text-xl font-medium tracking-tight text-slate-800 h-8">Click below to start</h2>
+                    
+                    <button id="start-toss-btn" class="mt-4 px-8 py-4 bg-accent-indigo text-white font-semibold rounded-2xl shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer w-full">
+                        Start Digital Toss
+                    </button>
+                </div>
+            </div>
+
+            <!-- View 2: Gameplay -->
+            <div id="view-gameplay" class="hidden space-y-8">
+                <div class="flex justify-between items-center">
+                    <h1 id="app-title" class="text-xl font-semibold tracking-tighter text-slate-400 uppercase">FUTURE READY?</h1>
+                    <div id="game-status" class="text-sm font-medium px-3 py-1 bg-slate-100 rounded-full text-slate-600">
+                        Your Turn
+                    </div>
+                </div>
+
+                <div id="grid" class="grid grid-cols-3 gap-3">
+                    <!-- Grid items injected here -->
+                </div>
+                
+                <div id="local-overlay" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-3xl z-10">
+                    <p id="local-status" class="text-2xl font-semibold tracking-tight text-slate-900"></p>
+                </div>
+            </div>
+
+            <!-- View 3: Outcome Screens -->
+            <div id="view-outcome" class="hidden text-center py-4 space-y-6">
+                <div id="outcome-image-container" class="hidden mb-4 rounded-2xl overflow-hidden shadow-lg border border-border-subtle">
+                    <img id="outcome-image" src="" alt="Outcome" class="w-full h-auto">
+                </div>
+                <div id="outcome-icon" class="text-6xl mb-4"></div>
+                <h2 id="outcome-headline" class="text-3xl font-semibold tracking-tight leading-tight"></h2>
+                <p id="outcome-subline" class="text-slate-500 text-lg leading-relaxed px-4 font-light"></p>
+                <button id="reset-btn" class="mt-8 px-8 py-4 bg-accent-indigo text-white font-semibold rounded-2xl shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
+                    Re-engage Matrix
+                </button>
+            </div>
+        </div>
+
+        <!-- Full-width Footer -->
+        <div id="toss-footer" class="hidden w-full h-32 overflow-hidden shrink-0">
+            <img src="Stalemate.png" alt="AI Footer" class="w-full h-full object-cover">
+        </div>
     </div>
+
     <script>
-        const pledge = document.getElementById('pledge'); const prestige = document.getElementById('prestige'); const flash = document.getElementById('flash'); const startBtn = document.getElementById('start-btn'); const startScreen = document.getElementById('start-screen'); const tossScreen = document.getElementById('toss-screen'); const winnerScreen = document.getElementById('winner-screen'); const winnerName = document.getElementById('winner-name'); const coin = document.getElementById('coin'); const coinShadow = document.getElementById('coin-shadow'); const tossResult = document.getElementById('toss-result'); const gameOverlay = document.getElementById('game-overlay'); const gameStatus = document.getElementById('game-status'); const cells = document.querySelectorAll('.cell'); const backgroundBlobs = document.querySelectorAll('.background-blob');
-        let audioCtx; let isRevealed = false; let gameActive = true; let board = ["", "", "", "", "", "", "", "", ""]; let currentPlayer = ""; 
-        const winConditions = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-        const points = Array.from(backgroundBlobs).map((blob, i) => {
-            const colors = ["#8B5CF6", "#C4B5FD", "#D946EF", "#22D3EE"]; blob.style.background = `radial-gradient(circle, ${colors[i]}, transparent 70%)`;
-            return { x: Math.random() * 100, y: Math.random() * 100, vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5, sin: Math.random() * Math.PI, speed: 0.02 + Math.random() * 0.03 };
-        });
-        function animateBackground() {
-            points.forEach((p, i) => { p.sin += p.speed; p.x += p.vx + Math.sin(p.sin) * 0.25; p.y += p.vy + Math.cos(p.sin) * 0.25; if (p.x < 5 || p.x > 95) p.vx *= -1; if (p.y < 5 || p.y > 95) p.vy *= -1; backgroundBlobs[i].style.left = p.x + '%'; backgroundBlobs[i].style.top = p.y + '%'; });
-            requestAnimationFrame(animateBackground);
-        }
-        animateBackground();
-        async function initAudio() { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-        function playSound(freq, duration = 0.1) {
-            if (!audioCtx) return; const osc = audioCtx.createOscillator(); const g = audioCtx.createGain(); osc.frequency.setValueAtTime(freq, audioCtx.currentTime); g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration); osc.connect(g); g.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
-        }
-        function triggerReveal(winner) {
-            if (isRevealed) return; isRevealed = true; gameActive = false;
-            winnerName.innerText = winner === "AI" ? "AI PRECISION WINS" : "HUMAN INSIGHT WINS";
-            winnerScreen.style.display = "flex"; setTimeout(() => winnerScreen.style.opacity = "1", 10);
-            const now = audioCtx.currentTime; const pt = (f, s, d) => { const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(f, now + s); g.gain.setValueAtTime(0, now + s); g.gain.linearRampToValueAtTime(0.4, now + s + 0.05); g.gain.exponentialRampToValueAtTime(0.01, now + s + d); o.connect(g); g.connect(audioCtx.destination); o.start(now + s); o.stop(now + s + d); };
-            pt(261.63, 0, 1.0); pt(329.63, 0.1, 1.0); pt(392.00, 0.2, 1.0); pt(523.25, 0.3, 1.5);
-            setTimeout(() => { flash.classList.add('flash-anim'); setTimeout(() => { winnerScreen.style.display = "none"; gameOverlay.style.opacity = '0'; prestige.classList.add('active'); pledge.style.opacity = '0.7'; }, 100); }, 1800);
-        }
-        async function runToss() {
-            startScreen.style.opacity = '0';
-            setTimeout(() => {
-                startScreen.style.display = 'none'; tossScreen.style.display = 'flex';
-                setTimeout(() => {
-                    const aiWinsToss = Math.random() > 0.4; const finalY = (5 + Math.floor(Math.random() * 5)) * 180 + (aiWinsToss ? 0 : 180);
-                    document.documentElement.style.setProperty('--final-rotation-y', `${finalY}deg`); coin.parentElement.classList.add('toss-up'); coin.classList.add('coin-flip'); coinShadow.style.transform = 'translateX(-50%) scale(0.4)'; coinShadow.style.opacity = '0.05'; playSound(440, 0.2);
-                    setTimeout(() => {
-                        tossResult.innerText = aiWinsToss ? "AI INITIATIVE" : "YOUR INITIATIVE"; playSound(aiWinsToss ? 880 : 660, 0.4); coinShadow.style.transform = 'translateX(-50%) scale(1)'; coinShadow.style.opacity = '0.1';
-                        setTimeout(() => { tossScreen.style.opacity = '0'; setTimeout(() => { tossScreen.style.display = 'none'; gameOverlay.style.display = 'flex'; gameOverlay.style.opacity = '1'; currentPlayer = aiWinsToss ? "O" : "X"; if (aiWinsToss) { gameStatus.innerText = "AI Processing Initiative..."; setTimeout(aiMove, 1200); } else { gameStatus.innerText = "Your Turn (Avoid 3-in-a-row)"; } }, 500); }, 1500);
-                    }, 2500);
-                }, 500);
-            }, 600);
-        }
-        function handleCellClick(e) {
-            const index = e.target.getAttribute('data-index'); if (board[index] !== "" || !gameActive || currentPlayer !== "X" || isRevealed) return;
-            makeMove(index);
-            setTimeout(() => { if (checkLose(board)) triggerReveal("AI"); else { currentPlayer = "O"; gameStatus.innerText = "AI Calculating Trap..."; setTimeout(aiMove, 1000); } }, 300);
-        }
-        function makeMove(index) { board[index] = "X"; cells[index].innerText = "X"; cells[index].classList.add('marked'); playSound(currentPlayer === "X" ? 800 : 600, 0.1); }
-        function aiMove() {
-            if (!gameActive || isRevealed) return;
-            let move = board.filter(v => v === "X").length === 0 ? 4 : getBestNotaktoMove(board);
-            if (move !== -1) {
-                makeMove(move);
-                setTimeout(() => { if (checkLose(board)) triggerReveal("Human"); else { currentPlayer = "X"; gameStatus.innerText = "Your Turn (Avoid 3-in-a-row)"; } }, 300);
-            }
-        }
-        function getBestNotaktoMove(cb) {
-            let bestScore = -Infinity; let move = -1;
-            for (let i = 0; i < 9; i++) {
-                if (cb[i] === "") {
-                    let tb = [...cb]; tb[i] = "X"; if (checkLose(tb)) continue;
-                    let hsm = 0; for (let j = 0; j < 9; j++) { if (tb[j] === "") { let nb = [...tb]; nb[j] = "X"; if (!checkLose(nb)) hsm++; } }
-                    let score = -hsm; if (score > bestScore) { bestScore = score; move = i; }
+        const config = {
+            "branding": {
+                "title": "Are you future ready?",
+                "tagline": "Are you safe in the AI-driven world? Let's check if you are future ready to survive the AI, or if you just need to switch your career."
+            },
+            "tossScreen": {
+                "searchingText": "Flipping Coin...",
+                "aiFirstText": "AI Wins Toss - Commencing Simulation",
+                "humanFirstText": "You Win Toss - Make Your Move"
+            },
+            "outcomeScreens": {
+                "victory": {
+                    "headline": "System Dominance Achieved",
+                    "subline": "The AI calculated every timeline. Your defeat was mathematically inevitable.",
+                    "buttonText": "Re-engage Matrix",
+                    "icon": "🤖"
+                },
+                "draw": {
+                    "headline": "Flawless Stalemate",
+                    "subline": "Impressive. You executed perfect play to hold off an optimal engine.",
+                    "buttonText": "Test Your Focus Again",
+                    "icon": "⚔️",
+                    "image": "Stalemate.png"
                 }
             }
-            return move === -1 ? cb.findIndex(v => v === "") : move;
+        };
+
+        const STATE = {
+            board: Array(9).fill(null),
+            isAiTurn: false,
+            gameActive: false,
+            aiToken: 'O',
+            humanToken: 'X'
+        };
+
+        const DOM = {
+            views: {
+                toss: document.getElementById('view-toss'),
+                gameplay: document.getElementById('view-gameplay'),
+                outcome: document.getElementById('view-outcome')
+            },
+            grid: document.getElementById('grid'),
+            tossStatus: document.getElementById('toss-status'),
+            coinInner: document.getElementById('coin-inner'),
+            headerContainer: document.getElementById('header-image-container'),
+            tossFooter: document.getElementById('toss-footer'),
+            startTossBtn: document.getElementById('start-toss-btn'),
+            gameStatus: document.getElementById('game-status'),
+            localOverlay: document.getElementById('local-overlay'),
+            localStatus: document.getElementById('local-status'),
+            outcomeHeadline: document.getElementById('outcome-headline'),
+            outcomeSubline: document.getElementById('outcome-subline'),
+            outcomeIcon: document.getElementById('outcome-icon'),
+            outcomeImage: document.getElementById('outcome-image'),
+            outcomeImageContainer: document.getElementById('outcome-image-container'),
+            resetBtn: document.getElementById('reset-btn')
+        };
+
+        // Synthetic Audio Generator
+        const SFX = {
+            ctx: null,
+            init() {
+                if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            },
+            whoosh() {
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(110, this.ctx.currentTime + 1);
+                
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 1);
+                
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.start();
+                osc.stop(this.ctx.currentTime + 1);
+            },
+            ping() {
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+                
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+                
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.3);
+            }
+        };
+
+        function switchView(viewName) {
+            Object.keys(DOM.views).forEach(v => DOM.views[v].classList.add('hidden'));
+            DOM.views[viewName].classList.remove('hidden');
+            
+            // Show header image only on Toss and Gameplay views
+            if (viewName === 'outcome') {
+                DOM.headerContainer.classList.add('hidden');
+            } else {
+                DOM.headerContainer.classList.remove('hidden');
+            }
+
+            // Show footer image only on Toss view
+            if (viewName === 'toss') {
+                DOM.tossFooter.classList.remove('hidden');
+            } else {
+                DOM.tossFooter.classList.add('hidden');
+            }
         }
-        function checkLose(cb) { return winConditions.some(c => c.every(i => cb[i] === "X")); }
-        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
-        startBtn.addEventListener('click', async () => { await initAudio(); runToss(); });
-        let resetTimer; stage.addEventListener('pointerdown', () => { if (isRevealed) resetTimer = setTimeout(() => location.reload(), 2000); });
-        stage.addEventListener('pointerup', () => clearTimeout(resetTimer));
+
+        function initGame() {
+            STATE.board = Array(9).fill(null);
+            STATE.gameActive = false;
+            renderBoard();
+            switchView('toss');
+            
+            DOM.tossStatus.innerText = "Click below to start";
+            DOM.startTossBtn.classList.remove('hidden');
+            DOM.coinInner.style.transform = 'rotateY(0deg)';
+            DOM.coinInner.classList.remove('coin-flipping');
+        }
+
+        function startToss() {
+            SFX.whoosh();
+            DOM.startTossBtn.classList.add('hidden');
+            DOM.tossStatus.innerText = config.tossScreen.searchingText;
+            DOM.coinInner.classList.add('coin-flipping');
+            
+            setTimeout(() => {
+                DOM.coinInner.classList.remove('coin-flipping');
+                const aiStarts = Math.random() < 0.5;
+                STATE.isAiTurn = aiStarts;
+                
+                const finalRotation = 1800 + (aiStarts ? 180 : 0);
+                DOM.coinInner.style.transform = `rotateY(${finalRotation}deg)`;
+                
+                setTimeout(() => {
+                    SFX.ping();
+                    DOM.tossStatus.innerText = aiStarts ? config.tossScreen.aiFirstText : config.tossScreen.humanFirstText;
+                    
+                    setTimeout(() => {
+                        switchView('gameplay');
+                        STATE.gameActive = true;
+                        if (STATE.isAiTurn) {
+                            aiMove();
+                        } else {
+                            updateStatus("Your Turn");
+                        }
+                    }, 1000);
+                }, 1500);
+            }, 1000);
+        }
+
+        function updateStatus(text) {
+            DOM.gameStatus.innerText = text;
+        }
+
+        function renderBoard() {
+            DOM.grid.innerHTML = '';
+            STATE.board.forEach((cell, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `h-24 w-full bg-slate-50 border border-slate-100 rounded-2xl text-4xl font-black flex items-center justify-center transition-all duration-300 ${!cell && STATE.gameActive ? 'hover:bg-white hover:shadow-md hover:-translate-y-1 cursor-pointer' : 'cursor-default'}`;
+                
+                if (cell) {
+                    btn.innerText = cell;
+                    btn.classList.add(cell === STATE.aiToken ? 'text-accent-indigo' : 'text-accent-emerald');
+                    btn.classList.add('scale-110');
+                }
+                
+                btn.addEventListener('click', () => handleHumanMove(idx));
+                DOM.grid.appendChild(btn);
+            });
+        }
+
+        function handleHumanMove(idx) {
+            if (STATE.board[idx] || STATE.isAiTurn || !STATE.gameActive) return;
+            
+            makeMove(idx, STATE.humanToken);
+            if (!checkGameOver()) {
+                STATE.isAiTurn = true;
+                updateStatus("AI Thinking...");
+                setTimeout(aiMove, 500);
+            }
+        }
+
+        function makeMove(idx, token) {
+            STATE.board[idx] = token;
+            renderBoard();
+        }
+
+        function aiMove() {
+            if (!STATE.gameActive) return;
+            const best = minimax(STATE.board, STATE.aiToken);
+            makeMove(best.index, STATE.aiToken);
+            
+            if (!checkGameOver()) {
+                STATE.isAiTurn = false;
+                updateStatus("Your Turn");
+            }
+        }
+
+        function checkGameOver() {
+            const result = getGameResult(STATE.board);
+            if (result) {
+                STATE.gameActive = false;
+                showLocalResolution(result);
+                return true;
+            }
+            return false;
+        }
+
+        function showLocalResolution(result) {
+            DOM.localStatus.innerText = result === 'draw' ? "STALEMATE" : "AI WINS";
+            DOM.localOverlay.classList.remove('hidden');
+            
+            setTimeout(() => {
+                DOM.localOverlay.classList.add('hidden');
+                showOutcome(result);
+            }, 3000);
+        }
+
+        function showOutcome(result) {
+            switchView('outcome');
+            const data = result === 'draw' ? config.outcomeScreens.draw : config.outcomeScreens.victory;
+            DOM.outcomeHeadline.innerText = data.headline;
+            DOM.outcomeSubline.innerText = data.subline;
+            DOM.outcomeIcon.innerText = data.icon;
+            DOM.resetBtn.innerText = data.buttonText;
+
+            if (data.image) {
+                DOM.outcomeImage.src = data.image;
+                DOM.outcomeImageContainer.classList.remove('hidden');
+                DOM.outcomeIcon.classList.add('hidden');
+            } else {
+                DOM.outcomeImageContainer.classList.add('hidden');
+                DOM.outcomeIcon.classList.remove('hidden');
+            }
+        }
+
+        function getGameResult(board) {
+            const wins = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            
+            for (let w of wins) {
+                if (board[w[0]] && board[w[0]] === board[w[1]] && board[w[0]] === board[w[2]]) {
+                    return board[w[0]] === STATE.aiToken ? 'ai' : 'human';
+                }
+            }
+            
+            if (board.every(cell => cell !== null)) return 'draw';
+            return null;
+        }
+
+        function minimax(newBoard, player) {
+            const availSpots = newBoard.map((v, i) => v === null ? i : null).filter(v => v !== null);
+
+            const result = getGameResult(newBoard);
+            if (result === 'human') return { score: -10 };
+            if (result === 'ai') return { score: 10 };
+            if (availSpots.length === 0) return { score: 0 };
+
+            const moves = [];
+            for (let i = 0; i < availSpots.length; i++) {
+                const move = {};
+                move.index = availSpots[i];
+                newBoard[availSpots[i]] = player;
+
+                if (player === STATE.aiToken) {
+                    const res = minimax(newBoard, STATE.humanToken);
+                    move.score = res.score;
+                } else {
+                    const res = minimax(newBoard, STATE.aiToken);
+                    move.score = res.score;
+                }
+
+                newBoard[availSpots[i]] = null;
+                moves.push(move);
+            }
+
+            let bestMove;
+            if (player === STATE.aiToken) {
+                let bestScore = -Infinity;
+                for (let i = 0; i < moves.length; i++) {
+                    if (moves[i].score > bestScore) {
+                        bestScore = moves[i].score;
+                        bestMove = i;
+                    }
+                }
+            } else {
+                let bestScore = Infinity;
+                for (let i = 0; i < moves.length; i++) {
+                    if (moves[i].score < bestScore) {
+                        bestScore = moves[i].score;
+                        bestMove = i;
+                    }
+                }
+            }
+            return moves[bestMove];
+        }
+
+        DOM.resetBtn.addEventListener('click', initGame);
+        DOM.startTossBtn.addEventListener('click', startToss);
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('Service Worker Registered'));
+        }
+
+        initGame();
     </script>
 </body>
 </html>

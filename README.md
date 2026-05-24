@@ -1,2 +1,0 @@
-# Marketing-card
-Marketing crd
