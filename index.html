@@ -10,12 +10,84 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style type="text/tailwindcss">
         @theme {
-            --color-bg-base: #f8fafc; /* slate-50 */
+            --color-bg-base: #fdfcfd; /* pearl-white */
             --color-border-subtle: #e2e8f0; /* slate-200 */
             --color-accent-indigo: #4f46e5; /* indigo-600 */
             --color-accent-emerald: #059669; /* emerald-600 */
         }
         
+        /* Mesh Gradient Background */
+        .mesh-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-color: #fdfcfd;
+            overflow: hidden;
+        }
+
+        .mesh-blob {
+            position: absolute;
+            width: 100vw;
+            height: 100vw;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.6;
+            animation: mesh-move 25s infinite alternate ease-in-out;
+        }
+
+        .blob-1 { 
+            top: -10%; left: -10%; 
+            background: radial-gradient(circle, rgba(167, 139, 250, 0.3) 0%, rgba(253, 252, 253, 0) 70%); 
+        }
+        .blob-2 { 
+            bottom: -10%; right: -10%; 
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, rgba(253, 252, 253, 0) 70%); 
+            animation-duration: 35s;
+        }
+        .blob-3 { 
+            top: 40%; left: 30%; 
+            background: radial-gradient(circle, rgba(196, 181, 253, 0.3) 0%, rgba(253, 252, 253, 0) 70%); 
+            animation-duration: 40s;
+        }
+
+        @keyframes mesh-move {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(15%, 10%) scale(1.2) rotate(10deg); }
+            100% { transform: translate(-10%, 20%) scale(0.9) rotate(-5deg); }
+        }
+
+        /* Glassmorphism Effect */
+        .glass-container {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+        }
+
+        .glass-button {
+            background: rgba(79, 70, 229, 0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-button:hover {
+            background: rgba(79, 70, 229, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .glass-grid-cell {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
         .coin-container {
             perspective: 1000px;
         }
@@ -53,10 +125,17 @@
         }
     </style>
 </head>
-<body class="bg-bg-base font-sans font-light text-slate-900 min-h-screen flex items-center justify-center p-4">
+<body class="font-sans font-light text-slate-900 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Mesh Background -->
+    <div class="mesh-bg">
+        <div class="mesh-blob blob-1"></div>
+        <div class="mesh-blob blob-2"></div>
+        <div class="mesh-blob blob-3"></div>
+    </div>
 
     <!-- App Container -->
-    <div id="app" class="w-full max-w-md bg-white rounded-3xl shadow-sm border border-border-subtle transition-all duration-500 overflow-hidden flex flex-col">
+    <div id="app" class="w-full max-w-md glass-container rounded-3xl transition-all duration-500 overflow-hidden flex flex-col">
         
         <!-- Full-width Header -->
         <div id="header-image-container" class="w-full h-48 overflow-hidden shrink-0">
@@ -73,13 +152,13 @@
                     
                     <div class="coin-container mx-auto my-8">
                         <div id="coin-inner" class="coin-inner w-full h-full relative">
-                            <div class="coin-face absolute inset-0 rounded-full flex items-center justify-center text-white text-lg font-thin tracking-widest shadow-lg ring-4 ring-accent-indigo/20">YOU</div>
-                            <div class="coin-face coin-back absolute inset-0 rounded-full flex items-center justify-center text-white text-lg font-thin tracking-widest shadow-lg ring-4 ring-accent-emerald/20">AI</div>
+                            <div class="coin-face absolute inset-0 rounded-full flex items-center justify-center text-white text-lg font-thin tracking-widest shadow-lg ring-1 ring-white/30">YOU</div>
+                            <div class="coin-face coin-back absolute inset-0 rounded-full flex items-center justify-center text-white text-lg font-thin tracking-widest shadow-lg ring-1 ring-white/30">AI</div>
                         </div>
                     </div>
                     <h2 id="toss-status" class="text-xl font-medium tracking-tight text-slate-800 h-8">Click below to start</h2>
                     
-                    <button id="start-toss-btn" class="mt-4 px-8 py-4 bg-accent-indigo text-white font-semibold rounded-2xl shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer w-full">
+                    <button id="start-toss-btn" class="mt-4 px-8 py-4 glass-button text-accent-indigo font-semibold rounded-2xl w-full shadow-sm">
                         Start Digital Toss
                     </button>
                 </div>
@@ -111,7 +190,7 @@
                 <div id="outcome-icon" class="text-6xl mb-4"></div>
                 <h2 id="outcome-headline" class="text-3xl font-semibold tracking-tight leading-tight"></h2>
                 <p id="outcome-subline" class="text-slate-500 text-lg leading-relaxed px-4 font-light"></p>
-                <button id="reset-btn" class="mt-8 px-8 py-4 bg-accent-indigo text-white font-semibold rounded-2xl shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer">
+                <button id="reset-btn" class="mt-8 px-8 py-4 glass-button text-accent-indigo font-semibold rounded-2xl w-full shadow-sm cursor-pointer">
                     Re-engage Matrix
                 </button>
             </div>
@@ -136,8 +215,8 @@
             },
             "outcomeScreens": {
                 "victory": {
-                    "headline": "System Dominance Achieved",
-                    "subline": "The AI calculated every timeline. Your defeat was mathematically inevitable.",
+                    "headline": "Automated Efficiency Achieved",
+                    "subline": "The AI identified your trajectory instantly. In a world of total automation, pure logic belongs to the machines. Your next move must be human.",
                     "buttonText": "Re-engage Matrix",
                     "icon": "🤖"
                 },
@@ -229,10 +308,8 @@
             Object.keys(DOM.views).forEach(v => DOM.views[v].classList.add('hidden'));
             DOM.views[viewName].classList.remove('hidden');
             
-            // Show header image only on Toss and Gameplay views
-            if (viewName === 'outcome') {
-                DOM.headerContainer.classList.add('hidden');
-            } else {
+            // Default header visibility: show on Toss and Gameplay
+            if (viewName === 'toss' || viewName === 'gameplay') {
                 DOM.headerContainer.classList.remove('hidden');
             }
 
@@ -295,7 +372,7 @@
             DOM.grid.innerHTML = '';
             STATE.board.forEach((cell, idx) => {
                 const btn = document.createElement('button');
-                btn.className = `h-24 w-full bg-slate-50 border border-slate-100 rounded-2xl text-4xl font-black flex items-center justify-center transition-all duration-300 ${!cell && STATE.gameActive ? 'hover:bg-white hover:shadow-md hover:-translate-y-1 cursor-pointer' : 'cursor-default'}`;
+                btn.className = `h-24 w-full glass-grid-cell rounded-2xl text-4xl font-black flex items-center justify-center transition-all duration-300 ${!cell && STATE.gameActive ? 'hover:bg-white/20 hover:shadow-md hover:-translate-y-1 cursor-pointer' : 'cursor-default'}`;
                 
                 if (cell) {
                     btn.innerText = cell;
@@ -359,6 +436,13 @@
             switchView('outcome');
             const isDraw = result === 'draw';
             const data = isDraw ? config.outcomeScreens.draw : config.outcomeScreens.victory;
+            
+            // Header image management for outcomes
+            if (isDraw) {
+                DOM.headerContainer.classList.add('hidden');
+            } else {
+                DOM.headerContainer.classList.remove('hidden');
+            }
             
             DOM.outcomeHeadline.innerText = data.headline;
             DOM.outcomeSubline.innerText = data.subline;
