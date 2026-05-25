@@ -357,17 +357,27 @@
             }
         }
 
-        function initGame() {
+        function initGame(quickStart = false) {
             STATE.board = Array(9).fill(null);
-            STATE.gameActive = false;
+            STATE.gameActive = true;
             renderBoard();
-            switchView('toss');
-            
-            DOM.tossStatus.innerText = "Click below to start";
-            DOM.startTossBtn.classList.remove('hidden');
-            DOM.coinInner.style.transform = 'rotateY(0deg)';
-            DOM.coinInner.classList.remove('coin-flipping');
+
+            if (quickStart) {
+                switchView('gameplay');
+                STATE.isAiTurn = true;
+                updateStatus("AI Thinking...");
+                aiTimeout = setTimeout(aiMove, 500);
+            } else {
+                switchView('toss');
+                STATE.gameActive = false;
+                DOM.tossStatus.innerText = "Click below to start";
+                DOM.startTossBtn.classList.remove('hidden');
+                DOM.coinInner.style.transform = 'rotateY(0deg)';
+                DOM.coinInner.classList.remove('coin-flipping');
+            }
         }
+
+        DOM.resetBtn.addEventListener('click', () => initGame(true));
 
         function startToss() {
             SFX.whoosh();
@@ -428,7 +438,7 @@
             if (!checkGameOver()) {
                 STATE.isAiTurn = true;
                 updateStatus("AI Thinking...");
-                setTimeout(aiMove, 500);
+                aiTimeout = setTimeout(aiMove, 500);
             }
         }
 
@@ -437,8 +447,11 @@
             renderBoard();
         }
 
+        let aiTimeout = null;
+
         function aiMove() {
             if (!STATE.gameActive) return;
+            if (aiTimeout) clearTimeout(aiTimeout); // Clear any pending moves
             
             const availSpots = STATE.board.map((v, i) => v === null ? i : null).filter(v => v !== null);
             const moves = [];
