@@ -201,9 +201,13 @@
 
             <!-- View 3: Outcome Screens -->
             <div id="view-outcome" class="hidden text-center py-2 space-y-4">
-                <div id="outcome-image-container" class="hidden mb-2 rounded-2xl overflow-hidden shadow-lg border border-white/40">
+                <div id="outcome-image-container" class="hidden mb-2 rounded-2xl overflow-hidden shadow-lg border border-white/40 relative">
                     <img id="outcome-image" src="" alt="Outcome" class="w-full h-auto">
+                    <button id="share-btn" class="absolute bottom-4 right-4 px-4 py-2 glass-button text-indigo-700 font-semibold rounded-xl text-sm shadow-sm z-20">
+                        Share Result
+                    </button>
                 </div>
+
                 <div id="outcome-icon" class="text-6xl mb-2"></div>
                 <h2 id="outcome-headline" class="text-3xl font-semibold tracking-tight leading-tight bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent"></h2>
                 <p id="outcome-subline" class="text-slate-500 text-lg leading-relaxed px-4 font-light"></p>
@@ -283,6 +287,7 @@
             outcomeIcon: document.getElementById('outcome-icon'),
             outcomeImage: document.getElementById('outcome-image'),
             outcomeImageContainer: document.getElementById('outcome-image-container'),
+            shareBtn: document.getElementById('share-btn'),
             resetBtn: document.getElementById('reset-btn'),
             luckyBtn: document.getElementById('lucky-btn'),
             lightbox: document.getElementById('lightbox')
@@ -532,6 +537,8 @@
                     DOM.outcomeHeadline.classList.add('hidden');
                     DOM.outcomeSubline.classList.add('hidden');
                     DOM.resetBtn.classList.add('hidden');
+                    // Ensure share button is visible for stalemate too
+                    DOM.shareBtn.classList.remove('hidden'); 
                     DOM.outcomeImage.style.cursor = 'pointer';
                     DOM.outcomeImage.onclick = initGame;
                 } else {
@@ -587,6 +594,25 @@
         DOM.startTossBtn.addEventListener('click', startToss);
         DOM.luckyBtn.addEventListener('click', () => DOM.lightbox.classList.remove('hidden'));
         DOM.lightbox.addEventListener('click', () => DOM.lightbox.classList.add('hidden'));
+        DOM.shareBtn.addEventListener('click', shareOutcome);
+
+        function shareOutcome() {
+            const imageSrc = DOM.outcomeImage.src;
+            if (navigator.share) {
+                fetch(imageSrc)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        const file = new File([blob], 'result.png', { type: 'image/png' });
+                        navigator.share({
+                            files: [file],
+                            title: 'My Game Result',
+                            text: 'Check out my game result!'
+                        }).catch(console.error);
+                    });
+            } else {
+                alert('Sharing not supported on this device.');
+            }
+        }
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
