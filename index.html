@@ -439,13 +439,48 @@
 
         function aiMove() {
             if (!STATE.gameActive) return;
-            const best = minimax(STATE.board, STATE.aiToken);
-            makeMove(best.index, STATE.aiToken);
+            
+            const availSpots = STATE.board.map((v, i) => v === null ? i : null).filter(v => v !== null);
+            const moves = [];
+            for (let i of availSpots) {
+                STATE.board[i] = STATE.aiToken;
+                const score = minimax(STATE.board, STATE.humanToken).score;
+                STATE.board[i] = null;
+                moves.push({ index: i, score });
+            }
+
+            const maxScore = Math.max(...moves.map(m => m.score));
+            const bestMoves = moves.filter(m => m.score === maxScore);
+
+            const threateningMove = bestMoves.find(m => {
+                const testBoard = [...STATE.board];
+                testBoard[m.index] = STATE.aiToken;
+                return getThreatCount(testBoard, STATE.aiToken) > 0;
+            });
+
+            const chosenMove = threateningMove || bestMoves[Math.floor(Math.random() * bestMoves.length)];
+            makeMove(chosenMove.index, STATE.aiToken);
             
             if (!checkGameOver()) {
                 STATE.isAiTurn = false;
                 updateStatus("Your Turn");
             }
+        }
+
+        function getThreatCount(board, player) {
+            const wins = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            let count = 0;
+            for (let w of wins) {
+                const line = [board[w[0]], board[w[1]], board[w[2]]];
+                if (line.filter(c => c === player).length === 2 && line.filter(c => c === null).length === 1) {
+                    count++;
+                }
+            }
+            return count;
         }
 
         function checkGameOver() {
@@ -533,50 +568,19 @@
         }
 
         function minimax(newBoard, player) {
-            const availSpots = newBoard.map((v, i) => v === null ? i : null).filter(v => v !== null);
-
             const result = getGameResult(newBoard);
             if (result === 'human') return { score: -10 };
             if (result === 'ai') return { score: 10 };
+            const availSpots = newBoard.map((v, i) => v === null ? i : null).filter(v => v !== null);
             if (availSpots.length === 0) return { score: 0 };
 
-            const moves = [];
-            for (let i = 0; i < availSpots.length; i++) {
-                const move = {};
-                move.index = availSpots[i];
-                newBoard[availSpots[i]] = player;
-
-                if (player === STATE.aiToken) {
-                    const res = minimax(newBoard, STATE.humanToken);
-                    move.score = res.score;
-                } else {
-                    const res = minimax(newBoard, STATE.aiToken);
-                    move.score = res.score;
-                }
-
-                newBoard[availSpots[i]] = null;
-                moves.push(move);
+            const scores = [];
+            for (let i of availSpots) {
+                newBoard[i] = player;
+                scores.push(minimax(newBoard, player === STATE.aiToken ? STATE.humanToken : STATE.aiToken).score);
+                newBoard[i] = null;
             }
-
-            let bestMove;
-            if (player === STATE.aiToken) {
-                let bestScore = -Infinity;
-                for (let i = 0; i < moves.length; i++) {
-                    if (moves[i].score > bestScore) {
-                        bestScore = moves[i].score;
-                        bestMove = i;
-                    }
-                }
-            } else {
-                let bestScore = Infinity;
-                for (let i = 0; i < moves.length; i++) {
-                    if (moves[i].score < bestScore) {
-                        bestScore = moves[i].score;
-                        bestMove = i;
-                    }
-                }
-            }
-            return moves[bestMove];
+            return { score: player === STATE.aiToken ? Math.max(...scores) : Math.min(...scores) };
         }
 
         DOM.resetBtn.addEventListener('click', initGame);
